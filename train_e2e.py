@@ -1,30 +1,31 @@
 #!/usr/bin/env python3
 """ Training for E2E-Spot """
 
-import os
 import argparse
-from contextlib import nullcontext
+import os
 import random
+from contextlib import nullcontext
+
 import numpy as np
-from tabulate import tabulate
 import torch
+from tabulate import tabulate
+
 torch.backends.cudnn.benchmark = True
+import timm
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.optim.lr_scheduler import (
-    ChainedScheduler, LinearLR, CosineAnnealingLR)
-from torch.utils.data import DataLoader
 import torchvision
-import timm
+from torch.optim.lr_scheduler import ChainedScheduler, CosineAnnealingLR, LinearLR
+from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from model.common import step, BaseRGBModel
-from model.shift import make_temporal_shift
-from model.modules import *
 from dataset.frame import ActionSpotDataset, ActionSpotVideoDataset
-from util.eval import process_frame_predictions
-from util.io import load_json, store_json, store_gz_json, clear_files
+from model.common import BaseRGBModel, step
+from model.modules import *
+from model.shift import make_temporal_shift
 from util.dataset import DATASETS, load_classes
+from util.eval import non_maximum_supression, process_frame_predictions
+from util.io import clear_files, load_json, store_gz_json, store_json
 from util.score import compute_mAPs
 
 EPOCH_NUM_FRAMES = 500000
@@ -45,8 +46,12 @@ def get_args():
     parser.add_argument('dataset', type=str, choices=DATASETS)
     parser.add_argument('frame_dir', type=str, help='Path to extracted frames')
 
-    parser.add_argument('--modality', type=str, choices=['rgb', 'bw', 'flow'],
-                        default='rgb')
+    parser.add_argument(
+        "--modality",
+        type=str,
+        choices=["rgb", "bw", "flow", "twostream", "pose"],
+        default="rgb",
+    )
     parser.add_argument(
         '-m', '--feature_arch', type=str, required=True, choices=[
             # From torchvision
@@ -107,7 +112,6 @@ def get_args():
     parser.add_argument('-mgpu', '--gpu_parallel', action='store_true')
     return parser.parse_args()
 
-
 class E2EModel(BaseRGBModel):
 
     class Impl(nn.Module):
@@ -116,7 +120,8 @@ class E2EModel(BaseRGBModel):
                      modality):
             super().__init__()
             is_rgb = modality == 'rgb'
-            in_channels = {'flow': 2, 'bw': 1, 'rgb': 3}[modality]
+            in_channels = {"flow": 2, "bw": 1, "rgb": 3, "twostream": 5}[modality]
+            # Expand to 5 channels for flow + rgb
 
             if feature_arch.startswith(('rn18', 'rn50')):
                 resnet_name = feature_arch.split('_')[0].replace('rn', 'resnet')
@@ -359,20 +364,35 @@ def evaluate(model, dataset, split, classes, save_pred, calc_stats=True,
 
     avg_mAP = None
     if calc_stats:
-        print('=== Results on {} (w/o NMS) ==='.format(split))
+        print("=== Results on {} ===".format(split))
         print('Error (frame-level): {:0.2f}\n'.format(err.get() * 100))
 
         def get_f1_tab_row(str_k):
             k = classes[str_k] if str_k != 'any' else None
-            return [str_k, f1.get(k) * 100, *f1.tp_fp_fn(k)]
+            tp, fp, fn = f1.tp_fp_fn(k)
+            prec = tp / (tp + fp) if tp + fp > 0 else 0
+            recall = tp / (tp + fn) if tp + fn > 0 else 0
+            return [str_k, f1.get(k) * 100, prec * 100, recall * 100, *f1.tp_fp_fn(k)]
+            # return [str_k, f1.get(k) * 100, *f1.tp_fp_fn(k)]
         rows = [get_f1_tab_row('any')]
         for c in sorted(classes):
             rows.append(get_f1_tab_row(c))
-        print(tabulate(rows, headers=['Exact frame', 'F1', 'TP', 'FP', 'FN'],
-                       floatfmt='0.2f'))
+        print(
+            tabulate(
+                rows,
+                headers=["Exact frame", "F1", "Prec", "Rec", "TP", "FP", "FN"],
+                floatfmt="0.2f",
+            )
+        )
         print()
 
-        mAPs, _ = compute_mAPs(dataset.labels, pred_events_high_recall)
+        # DEBUG >>> can add non_maximum_supression to pred_events_high_recall to analyze results
+        # mAPs, _ = compute_mAPs(dataset.labels, pred_events_high_recall, plot_pr=True)
+        mAPs, _ = compute_mAPs(
+            dataset.labels,
+            non_maximum_supression(pred_events_high_recall, 0),
+            plot_pr=True,
+        )
         avg_mAP = np.mean(mAPs[1:])
 
     if save_pred is not None:

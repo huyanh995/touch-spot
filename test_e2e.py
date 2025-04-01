@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """ Inference for E2E-Spot """
 
-import os
 import argparse
+import os
 import re
+
 import torch
 
 from dataset.frame import ActionSpotVideoDataset
-from util.io import load_json
-from util.dataset import load_classes
 from train_e2e import E2EModel, evaluate
+from util.dataset import load_classes
+from util.eval import non_maximum_supression
+from util.io import load_json
 
 
 def get_args():
@@ -95,8 +97,7 @@ def main(model_dir, frame_dir, split, no_overlap, save, save_as, dataset):
     if pred_file is not None:
         print('Saving predictions:', pred_file)
 
-    evaluate(model, split_data, split.upper(), classes, pred_file,
-             calc_stats=False)
+    evaluate(model, split_data, split.upper(), classes, pred_file, calc_stats=True)
 
 
 if __name__ == '__main__':

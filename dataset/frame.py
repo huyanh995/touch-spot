@@ -1,19 +1,25 @@
 #!/usr/bin/env python3
 
-import os
 import copy
+import os
 import random
+
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset
 import torchvision
 import torchvision.transforms as transforms
+from torch.utils.data import Dataset
 
 from util.io import load_json
-from .transform import RandomGaussianNoise, RandomHorizontalFlipFLow, \
-    RandomOffsetFlow, SeedableRandomSquareCrop, ThreeCrop
 
+from .transform import (
+    RandomGaussianNoise,
+    RandomHorizontalFlipFLow,
+    RandomOffsetFlow,
+    SeedableRandomSquareCrop,
+    ThreeCrop,
+)
 
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
@@ -24,18 +30,32 @@ class FrameReader:
     IMG_NAME = '{:06d}.jpg'
 
     def __init__(self, frame_dir, modality, crop_transform, img_transform,
-                 same_transform):
+                 same_transform, second_stream_transforms=None):
         self._frame_dir = frame_dir
+        self._modality = modality
         self._is_flow = modality == 'flow'
         self._crop_transform = crop_transform
         self._img_transform = img_transform
         self._same_transform = same_transform
+        self._second_stream_transforms = second_stream_transforms
 
     def read_frame(self, frame_path):
         img = torchvision.io.read_image(frame_path).float() / 255
         if self._is_flow:
             img = img[1:, :, :]     # GB channels contain data
         return img
+
+    def read_rgb_flow(self, frame_path):
+        # Assume RGB is in frames/ and Flow is in flows/
+        img = torchvision.io.read_image(frame_path).float() / 255
+        flow = torchvision.io.read_image(frame_path.replace('frames', 'flows')).float() / 255
+        flow = flow[1:, :, :]     # GB channels contain data
+
+        return img, flow
+
+    def read_rgb_pose(self, frame_path):
+        raise NotImplementedError('Pose not implemented yet!')
+
 
     def load_frames(self, video_name, start, end, pad=False, stride=1,
                     randomize=False):
@@ -56,7 +76,11 @@ class FrameReader:
                 self._frame_dir, video_name,
                 FrameReader.IMG_NAME.format(frame_num))
             try:
-                img = self.read_frame(frame_path)
+                if self._modality == 'twostream':
+                    img, second = self.read_rgb_flow(frame_path)
+                else:
+                    img = self.read_frame(frame_path)
+                    second = None
                 if self._crop_transform:
                     if self._same_transform:
                         if rand_crop_state is None:
@@ -66,6 +90,7 @@ class FrameReader:
                             random.setstate(rand_crop_state)
 
                     img = self._crop_transform(img)
+                    second = self._crop_transform(second) if second is not None else None
 
                     if rand_state_backup is not None:
                         # Make sure that rand state still advances
@@ -74,15 +99,25 @@ class FrameReader:
 
                 if not self._same_transform:
                     img = self._img_transform(img)
+                    second = self._second_stream_transforms(second) if second is not None else None
+
+                if second is not None:
+                    # Merge RGB and Flow together
+                    img = torch.cat((img, second), dim=0)
+
                 ret.append(img)
             except RuntimeError:
                 # print('Missing file!', frame_path)
                 n_pad_end += 1
 
         # In the multicrop case, the shape is (B, T, C, H, W)
-        ret = torch.stack(ret, dim=int(len(ret[0].shape) == 4))
+        ret = torch.stack(ret, dim=int(len(ret[0].shape) == 4)) # DEBUG (40, 5, 224, 224)
         if self._same_transform:
-            ret = self._img_transform(ret)
+            if self._modality == 'twostream':
+                ret[:, :3, :, :] = self._img_transform(ret[:, :3, :, :]) # the first 3 channels are RGB
+                ret[:, 3:, :, :] = self._second_stream_transforms(ret[:, 3:, :, :]) # the last 2 channels are Flow
+            else:
+                ret = self._img_transform(ret)
 
         # Always pad start, but only pad end if requested
         if n_pad_start > 0 or (pad and n_pad_end > 0):
@@ -158,6 +193,48 @@ def _load_frame_deferred(gpu_transform, batch, device):
                     frame_mix[i].to(device))
     return frame
 
+def _rgb_transforms(is_eval, defer_transform):
+    img_transforms = []
+    if not is_eval:
+        img_transforms.append(
+            transforms.RandomHorizontalFlip())
+
+        if not defer_transform:
+            img_transforms.extend([
+                # Jittering separately is faster (low variance)
+                transforms.RandomApply(
+                    nn.ModuleList([transforms.ColorJitter(hue=0.2)]),
+                    p=0.25),
+                transforms.RandomApply(
+                    nn.ModuleList([
+                        transforms.ColorJitter(saturation=(0.7, 1.2))
+                    ]), p=0.25),
+                transforms.RandomApply(
+                    nn.ModuleList([
+                        transforms.ColorJitter(brightness=(0.7, 1.2))
+                    ]), p=0.25),
+                transforms.RandomApply(
+                    nn.ModuleList([
+                        transforms.ColorJitter(contrast=(0.7, 1.2))
+                    ]), p=0.25),
+
+                # Jittering together is slower (high variance)
+                # transforms.RandomApply(
+                #     nn.ModuleList([
+                #         transforms.ColorJitter(
+                #             brightness=(0.7, 1.2), contrast=(0.7, 1.2),
+                #             saturation=(0.7, 1.2), hue=0.2)
+                #     ]), p=0.8),
+
+                transforms.RandomApply(
+                    nn.ModuleList([transforms.GaussianBlur(5)]), p=0.25)
+            ])
+
+    if not defer_transform:
+        img_transforms.append(transforms.Normalize(
+            mean=IMAGENET_MEAN, std=IMAGENET_STD))
+
+    return img_transforms
 
 def _get_img_transforms(
         is_eval,
@@ -181,45 +258,11 @@ def _get_img_transforms(
             crop_transform = transforms.RandomCrop(crop_dim)
 
     img_transforms = []
+    second_stream_transforms = [] # use in RGB + Flow or RGB + Pose
+
     if modality == 'rgb':
-        if not is_eval:
-            img_transforms.append(
-                transforms.RandomHorizontalFlip())
+        img_transforms = _rgb_transforms(is_eval, defer_transform)
 
-            if not defer_transform:
-                img_transforms.extend([
-                    # Jittering separately is faster (low variance)
-                    transforms.RandomApply(
-                        nn.ModuleList([transforms.ColorJitter(hue=0.2)]),
-                        p=0.25),
-                    transforms.RandomApply(
-                        nn.ModuleList([
-                            transforms.ColorJitter(saturation=(0.7, 1.2))
-                        ]), p=0.25),
-                    transforms.RandomApply(
-                        nn.ModuleList([
-                            transforms.ColorJitter(brightness=(0.7, 1.2))
-                        ]), p=0.25),
-                    transforms.RandomApply(
-                        nn.ModuleList([
-                            transforms.ColorJitter(contrast=(0.7, 1.2))
-                        ]), p=0.25),
-
-                    # Jittering together is slower (high variance)
-                    # transforms.RandomApply(
-                    #     nn.ModuleList([
-                    #         transforms.ColorJitter(
-                    #             brightness=(0.7, 1.2), contrast=(0.7, 1.2),
-                    #             saturation=(0.7, 1.2), hue=0.2)
-                    #     ]), p=0.8),
-
-                    transforms.RandomApply(
-                        nn.ModuleList([transforms.GaussianBlur(5)]), p=0.25)
-                ])
-
-        if not defer_transform:
-            img_transforms.append(transforms.Normalize(
-                mean=IMAGENET_MEAN, std=IMAGENET_STD))
     elif modality == 'bw':
         if not is_eval:
             img_transforms.extend([
@@ -258,11 +301,35 @@ def _get_img_transforms(
                 RandomOffsetFlow(),
                 RandomGaussianNoise()
             ])
+    elif modality == 'twostream':
+        # Basically combined RGB and Flow transforms above
+        assert not defer_transform
+
+        # RGB transforms
+        img_transforms = _rgb_transforms(is_eval, defer_transform)
+
+        # Flow transforms
+        second_stream_transforms.append(transforms.Normalize(
+            mean=[0.5, 0.5], std=[0.5, 0.5]))
+
+        if not is_eval:
+            second_stream_transforms.extend([
+                RandomHorizontalFlipFLow(),
+                RandomOffsetFlow(),
+                RandomGaussianNoise()
+            ])
+    elif modality == 'pose':
+        raise NotImplementedError(modality)
+
     else:
         raise NotImplementedError(modality)
 
     img_transform = torch.jit.script(nn.Sequential(*img_transforms))
-    return crop_transform, img_transform
+    if second_stream_transforms:
+        second_stream_transforms = torch.jit.script(
+            nn.Sequential(*second_stream_transforms))
+
+    return crop_transform, img_transform, second_stream_transforms
 
 
 def _print_info_helper(src_file, labels):
@@ -279,23 +346,23 @@ IGNORED_NOT_SHOWN_FLAG = False
 class ActionSpotDataset(Dataset):
 
     def __init__(
-            self,
-            classes,                    # dict of class names to idx
-            label_file,                 # path to label json
-            frame_dir,                  # path to frames
-            modality,                   # [rgb, bw, flow]
-            clip_len,
-            dataset_len,                # Number of clips
-            is_eval=True,               # Disable random augmentation
-            crop_dim=None,
-            stride=1,                   # Downsample frame rate
-            same_transform=True,        # Apply the same random augmentation to
-                                        # each frame in a clip
-            dilate_len=0,               # Dilate ground truth labels
-            mixup=False,
-            pad_len=DEFAULT_PAD_LEN,    # Number of frames to pad the start
-                                        # and end of videos
-            fg_upsample=-1,             # Sample foreground explicitly
+        self,
+        classes,  # dict of class names to idx
+        label_file,  # path to label json
+        frame_dir,  # path to frames
+        modality,  # [rgb, bw, flow] # add twostream
+        clip_len,
+        dataset_len,  # Number of clips
+        is_eval=True,  # Disable random augmentation
+        crop_dim=None,
+        stride=1,  # Downsample frame rate
+        same_transform=True,  # Apply the same random augmentation to
+        # each frame in a clip
+        dilate_len=0,  # Dilate ground truth labels
+        mixup=False,
+        pad_len=DEFAULT_PAD_LEN,  # Number of frames to pad the start
+        # and end of videos
+        fg_upsample=-1,  # Sample foreground explicitly
     ):
         self._src_file = label_file
         self._labels = load_json(label_file)
@@ -340,12 +407,12 @@ class ActionSpotDataset(Dataset):
                 print('=> Deferring some BW transforms to the GPU!')
                 self._gpu_transform = _get_deferred_bw_transform()
 
-        crop_transform, img_transform = _get_img_transforms(
+        crop_transform, img_transform, second_stream_transforms = _get_img_transforms(
             is_eval, crop_dim, modality, same_transform,
             defer_transform=self._gpu_transform is not None)
 
         self._frame_reader = FrameReader(
-            frame_dir, modality, crop_transform, img_transform, same_transform)
+            frame_dir, modality, crop_transform, img_transform, same_transform, second_stream_transforms)
 
     def load_frame_gpu(self, batch, device):
         if self._gpu_transform is None:
@@ -466,13 +533,13 @@ class ActionSpotVideoDataset(Dataset):
         self._clip_len = clip_len
         self._stride = stride
 
-        crop_transform, img_transform = _get_img_transforms(
+        crop_transform, img_transform, second_stream_transforms = _get_img_transforms(
             is_eval=True, crop_dim=crop_dim, modality=modality, same_transform=True, multi_crop=multi_crop)
 
         # No need to enforce same_transform since the transforms are
         # deterministic
         self._frame_reader = FrameReader(
-            frame_dir, modality, crop_transform, img_transform, False)
+            frame_dir, modality, crop_transform, img_transform, False, second_stream_transforms)
 
         self._flip = flip
         self._multi_crop = multi_crop

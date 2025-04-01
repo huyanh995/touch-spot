@@ -1,5 +1,6 @@
 import copy
 from collections import defaultdict
+
 import numpy as np
 
 
@@ -78,7 +79,26 @@ def process_frame_predictions(
         # support[support == 0] = 1   # get rid of divide by zero
         assert np.min(support) > 0, (video, support.tolist())
         scores /= support[:, None]
+        # DEBUG >>> Stats model injection here
+        # Gaussian prediction
+        # np.random.seed(42)
+        # _scores = np.load("gaussian.npy")
+        # noise = np.random.normal(0, _scores * 0.001)
+        # _scores = np.clip(_scores + noise, 0.0, 1.0)
+        # scores = np.zeros((len(_scores), 2))
+        # scores[:, 0] = 1 - _scores
+        # scores[:, 1] = _scores
+
+        # Mode prediction
+        # scores = np.zeros_like(scores)
+        # scores[:, 0] = 1
+        # scores[31] = [0.0, 1.0]
+        ##############################
+
+        # DEBUG >>> the following line determines the prediction
         pred = np.argmax(scores, axis=1)
+        # pred = (scores[:, 1] >= 0.3).astype(int)
+
         err.update(label, pred)
 
         pred_scores[video] = scores.tolist()
@@ -109,6 +129,8 @@ def process_frame_predictions(
         pred_events_high_recall.append({
             'video': video, 'events': events_high_recall,
             'fps': fps_dict[video]})
+
+    print("DEBUG")
 
     return err, f1, pred_events, pred_events_high_recall, pred_scores
 

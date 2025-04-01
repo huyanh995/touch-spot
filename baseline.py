@@ -1,25 +1,24 @@
 #!/usr/bin/env python3
 """ Training for baselines """
 
-import os
 import argparse
 import copy
+import os
 import random
+
 import numpy as np
 import torch
-from torch.utils.data import DataLoader
-from torch.optim.lr_scheduler import (
-    ChainedScheduler, LinearLR, CosineAnnealingLR)
 from tabulate import tabulate
+from torch.optim.lr_scheduler import ChainedScheduler, CosineAnnealingLR, LinearLR
+from torch.utils.data import DataLoader
 
-from model.feature import GRU, TCN, GCN, ASFormer
-from model.impl.calf import ContextAwareWeights
 from dataset.feature import FeatureDataset
-from util.io import store_json, store_gz_json
-from util.eval import ForegroundF1, ErrorStat
+from model.feature import GCN, GRU, TCN, ASFormer
+from model.impl.calf import ContextAwareWeights
 from util.dataset import DATASETS, load_classes
+from util.eval import ErrorStat, ForegroundF1
+from util.io import store_gz_json, store_json
 from util.score import compute_mAPs
-
 
 EPOCH_NUM_FRAMES = 1000000
 
