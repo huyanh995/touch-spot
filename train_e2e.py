@@ -4,11 +4,14 @@
 import argparse
 import os
 import random
+import warnings
 from contextlib import nullcontext
 
 import numpy as np
 import torch
 from tabulate import tabulate
+
+warnings.filterwarnings("ignore", category=UserWarning)
 
 torch.backends.cudnn.benchmark = True
 import timm

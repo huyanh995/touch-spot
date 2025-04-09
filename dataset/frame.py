@@ -218,14 +218,6 @@ def _rgb_transforms(is_eval, defer_transform):
                         transforms.ColorJitter(contrast=(0.7, 1.2))
                     ]), p=0.25),
 
-                # Jittering together is slower (high variance)
-                # transforms.RandomApply(
-                #     nn.ModuleList([
-                #         transforms.ColorJitter(
-                #             brightness=(0.7, 1.2), contrast=(0.7, 1.2),
-                #             saturation=(0.7, 1.2), hue=0.2)
-                #     ]), p=0.8),
-
                 transforms.RandomApply(
                     nn.ModuleList([transforms.GaussianBlur(5)]), p=0.25)
             ])
