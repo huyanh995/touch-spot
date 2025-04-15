@@ -234,18 +234,18 @@ class FrameReader:
                 import matplotlib.pyplot as plt
 
                 # Save RGB image (first 3 channels)
-                rgb_img = (img[:3, :, :].clamp(0, 1) * 255).byte()
-                torchvision.io.write_jpeg(rgb_img, "debug_img.jpg")
+                # rgb_img = (img[:3, :, :].clamp(0, 1) * 255).byte()
+                # torchvision.io.write_jpeg(rgb_img, "debug_img.jpg")
 
-                # Create and normalize pose heatmap from remaining channels
-                debug_pose = img[3:, :, :].sum(dim=0)
-                debug_pose = (debug_pose - debug_pose.min()) / (debug_pose.max() - debug_pose.min() + 1e-5)  # avoid divide by 0
+                # # Create and normalize pose heatmap from remaining channels
+                # debug_pose = img[3:, :, :].sum(dim=0)
+                # debug_pose = (debug_pose - debug_pose.min()) / (debug_pose.max() - debug_pose.min() + 1e-5)  # avoid divide by 0
 
-                # Save heatmap as clean image
-                plt.imshow(debug_pose.cpu().numpy(), cmap='inferno')
-                plt.axis('off')
-                plt.savefig("debug_pose.jpg", bbox_inches='tight', pad_inches=0)
-                plt.close()
+                # # Save heatmap as clean image
+                # plt.imshow(debug_pose.cpu().numpy(), cmap='inferno')
+                # plt.axis('off')
+                # plt.savefig("debug_pose.jpg", bbox_inches='tight', pad_inches=0)
+                # plt.close()
                 ###### End #####
             except RuntimeError as e:
                 # print("DEBUG", e)
