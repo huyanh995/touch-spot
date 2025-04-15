@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import copy
+import json
 import os
 import random
 
@@ -32,6 +33,7 @@ class FrameReader:
     def __init__(self, frame_dir, modality, crop_transform, img_transform,
                  same_transform, second_stream_transforms=None):
         self._frame_dir = frame_dir
+        self._pose_dir = os.path.join(os.path.dirname(frame_dir), 'mediapipe_hand_pose')
         self._modality = modality
         self._is_flow = modality == 'flow'
         self._crop_transform = crop_transform
@@ -56,6 +58,111 @@ class FrameReader:
     def read_rgb_pose(self, frame_path):
         raise NotImplementedError('Pose not implemented yet!')
 
+    def gaussian_pose(self, pose, size, dtype=torch.float32, sigma=3):
+        heatmap = torch.zeros((42, *size), dtype=dtype)
+        height, width = size
+        # Pre-compute constants for efficiency
+        sigma_sq_2 = 2 * sigma * sigma
+        kernel_size = int(6 * sigma + 3)
+        if 'left' in pose:
+            for idx, (x, y) in enumerate(pose['left']):
+                if x is not None and y is not None and 0 <= x < width and 0 <= y < height:
+                    # Calculate window boundaries
+                    x0 = max(0, x - kernel_size // 2)
+                    y0 = max(0, y - kernel_size // 2)
+                    x1 = min(width, x + kernel_size // 2 + 1)
+                    y1 = min(height, y + kernel_size // 2 + 1)
+                    # Generate Gaussian
+                    for map_y in range(y0, y1):
+                        for map_x in range(x0, x1):
+                            d2 = (map_x - x) ** 2 + (map_y - y) ** 2
+                            heatmap[idx, map_y, map_x] = torch.exp(torch.tensor(-d2 / sigma_sq_2))
+        else:
+            heatmap[:21, :, :] = 0.05  # a small constant value for better gradient
+        if 'right' in pose:
+            for idx, (x, y) in enumerate(pose['right']):
+                if x is not None and y is not None and 0 <= x < width and 0 <= y < height:
+                    # Calculate window boundaries
+                    x0 = max(0, x - kernel_size // 2)
+                    y0 = max(0, y - kernel_size // 2)
+                    x1 = min(width, x + kernel_size // 2 + 1)
+                    y1 = min(height, y + kernel_size // 2 + 1)
+                    # Generate Gaussian
+                    for map_y in range(y0, y1):
+                        for map_x in range(x0, x1):
+                            d2 = (map_x - x) ** 2 + (map_y - y) ** 2
+                            heatmap[idx + 21, map_y, map_x] = torch.exp(torch.tensor(-d2 / sigma_sq_2))
+        else:
+            heatmap[21:, :, :] = 0.05
+        return heatmap
+
+    # def gaussian_pose(self, pose, size, dtype=torch.float32, sigma=3, scale_factor=4):
+    #     """
+    #     Generate Gaussian heatmaps for pose keypoints.
+
+    #     Args:
+    #         pose: Dictionary containing 'left' and 'right' keypoints
+    #         size: Tuple (height, width) for the output heatmap
+    #         dtype: Torch data type for the output tensor
+    #         sigma: Standard deviation for Gaussian kernel
+    #         scale_factor: Downscaling factor (4 for quarter size, 2 for half size)
+
+    #     Returns:
+    #         Tensor of shape (42, height, width) containing the heatmaps
+    #     """
+    #     heatmap = torch.zeros((42, *size), dtype=dtype)
+    #     height, width = size
+
+    #     # Scale the sigma proportionally to the scale factor
+    #     scaled_sigma = sigma / scale_factor
+
+    #     # Pre-compute constants for efficiency with scaled sigma
+    #     sigma_sq_2 = 2 * scaled_sigma * scaled_sigma
+    #     kernel_size = int(6 * scaled_sigma + 3)
+
+    #     if 'left' in pose:
+    #         for idx, (x, y) in enumerate(pose['left']):
+    #             if x is not None and y is not None:
+    #                 # Downscale coordinates by the scale factor
+    #                 x_scaled = x // scale_factor
+    #                 y_scaled = y // scale_factor
+
+    #                 if 0 <= x_scaled < width and 0 <= y_scaled < height:
+    #                     # Calculate window boundaries
+    #                     x0 = max(0, x_scaled - kernel_size // 2)
+    #                     y0 = max(0, y_scaled - kernel_size // 2)
+    #                     x1 = min(width, x_scaled + kernel_size // 2 + 1)
+    #                     y1 = min(height, y_scaled + kernel_size // 2 + 1)
+    #                     # Generate Gaussian
+    #                     for map_y in range(y0, y1):
+    #                         for map_x in range(x0, x1):
+    #                             d2 = (map_x - x_scaled) ** 2 + (map_y - y_scaled) ** 2
+    #                             heatmap[idx, map_y, map_x] = torch.exp(torch.tensor(-d2 / sigma_sq_2))
+    #     else:
+    #         heatmap[:21, :, :] = 0.05  # a small constant value for better gradient
+
+    #     if 'right' in pose:
+    #         for idx, (x, y) in enumerate(pose['right']):
+    #             if x is not None and y is not None:
+    #                 # Downscale coordinates by the scale factor
+    #                 x_scaled = x // scale_factor
+    #                 y_scaled = y // scale_factor
+
+    #                 if 0 <= x_scaled < width and 0 <= y_scaled < height:
+    #                     # Calculate window boundaries
+    #                     x0 = max(0, x_scaled - kernel_size // 2)
+    #                     y0 = max(0, y_scaled - kernel_size // 2)
+    #                     x1 = min(width, x_scaled + kernel_size // 2 + 1)
+    #                     y1 = min(height, y_scaled + kernel_size // 2 + 1)
+    #                     # Generate Gaussian
+    #                     for map_y in range(y0, y1):
+    #                         for map_x in range(x0, x1):
+    #                             d2 = (map_x - x_scaled) ** 2 + (map_y - y_scaled) ** 2
+    #                             heatmap[idx + 21, map_y, map_x] = torch.exp(torch.tensor(-d2 / sigma_sq_2))
+    #     else:
+    #         heatmap[21:, :, :] = 0.05
+
+    #     return heatmap
 
     def load_frames(self, video_name, start, end, pad=False, stride=1,
                     randomize=False):
@@ -64,6 +171,8 @@ class FrameReader:
         ret = []
         n_pad_start = 0
         n_pad_end = 0
+        with open(os.path.join(self._pose_dir, f'{video_name}.json'), 'r') as f:
+            pose_data = json.load(f)
         for frame_num in range(start, end, stride):
             if randomize and stride > 1:
                 frame_num += random.randint(0, stride - 1)
@@ -80,7 +189,12 @@ class FrameReader:
                     img, second = self.read_rgb_flow(frame_path)
                 else:
                     img = self.read_frame(frame_path)
-                    second = None
+                    if os.path.basename(frame_path) in pose_data:
+                        _data = pose_data[os.path.basename(frame_path)]
+                    else:
+                        _data = {}
+
+                    second = self.gaussian_pose(_data, list(img.shape[-2:]))
                 if self._crop_transform:
                     if self._same_transform:
                         if rand_crop_state is None:
@@ -89,8 +203,15 @@ class FrameReader:
                             rand_state_backup = random.getstate()
                             random.setstate(rand_crop_state)
 
-                    img = self._crop_transform(img)
-                    second = self._crop_transform(second) if second is not None else None
+                    # Need to combine before cropping
+                    if second is not None:
+                        img = torch.cat((img, second), dim=0)
+                        img = self._crop_transform(img)
+                        second = img[3:, :, :].clone()  # Copy pose heatmap
+                        img = img[:3, :, :].clone()  # Only keep RGB channels
+                    else:
+                        img = self._crop_transform(img)
+                    # second = self._crop_transform(second) if second is not None else None
 
                     if rand_state_backup is not None:
                         # Make sure that rand state still advances
@@ -99,14 +220,35 @@ class FrameReader:
 
                 if not self._same_transform:
                     img = self._img_transform(img)
-                    second = self._second_stream_transforms(second) if second is not None else None
+                    # second_stream_transforms can be empty list -> Not using it
+                    if self._second_stream_transforms:
+                        second = self._second_stream_transforms(second) if second is not None else None
 
                 if second is not None:
-                    # Merge RGB and Flow together
+                    # Merge RGB and Pose together
                     img = torch.cat((img, second), dim=0)
 
                 ret.append(img)
-            except RuntimeError:
+
+                ###### Visualize debug #####
+                import matplotlib.pyplot as plt
+
+                # Save RGB image (first 3 channels)
+                rgb_img = (img[:3, :, :].clamp(0, 1) * 255).byte()
+                torchvision.io.write_jpeg(rgb_img, "debug_img.jpg")
+
+                # Create and normalize pose heatmap from remaining channels
+                debug_pose = img[3:, :, :].sum(dim=0)
+                debug_pose = (debug_pose - debug_pose.min()) / (debug_pose.max() - debug_pose.min() + 1e-5)  # avoid divide by 0
+
+                # Save heatmap as clean image
+                plt.imshow(debug_pose.cpu().numpy(), cmap='inferno')
+                plt.axis('off')
+                plt.savefig("debug_pose.jpg", bbox_inches='tight', pad_inches=0)
+                plt.close()
+                ###### End #####
+            except RuntimeError as e:
+                # print("DEBUG", e)
                 # print('Missing file!', frame_path)
                 n_pad_end += 1
 
@@ -117,7 +259,9 @@ class FrameReader:
                 ret[:, :3, :, :] = self._img_transform(ret[:, :3, :, :]) # the first 3 channels are RGB
                 ret[:, 3:, :, :] = self._second_stream_transforms(ret[:, 3:, :, :]) # the last 2 channels are Flow
             else:
-                ret = self._img_transform(ret)
+                # ret = self._img_transform(ret) # TODO split transform here.
+                # No Flip transform here.
+                ret[:, :3, :, :] = self._img_transform(ret[:, :3, :, :]) # the first 3 channels are RGB
 
         # Always pad start, but only pad end if requested
         if n_pad_start > 0 or (pad and n_pad_end > 0):
@@ -178,10 +322,11 @@ def _get_deferred_bw_transform():
 
 
 def _load_frame_deferred(gpu_transform, batch, device):
-    frame = batch['frame'].to(device)
+    frame = batch['frame'].to(device) # (B, T, C, H, W)
     with torch.no_grad():
         for i in range(frame.shape[0]):
-            frame[i] = gpu_transform(frame[i])
+            # frame[i] = gpu_transform(frame[i])
+            frame[i][:, :3, :, :] = gpu_transform(frame[i][:, :3, :, :]) # Only RGB channels
 
         if 'mix_weight' in batch:
             weight = batch['mix_weight'].to(device)
@@ -196,8 +341,8 @@ def _load_frame_deferred(gpu_transform, batch, device):
 def _rgb_transforms(is_eval, defer_transform):
     img_transforms = []
     if not is_eval:
-        img_transforms.append(
-            transforms.RandomHorizontalFlip())
+        # img_transforms.append(
+        #     transforms.RandomHorizontalFlip()) # Not make sense in pose, left and right hand is swapped
 
         if not defer_transform:
             img_transforms.extend([
@@ -311,7 +456,9 @@ def _get_img_transforms(
                 RandomGaussianNoise()
             ])
     elif modality == 'pose':
-        raise NotImplementedError(modality)
+        img_transforms = _rgb_transforms(is_eval, defer_transform) # comment out random flip now
+        # Since all the transforms on RGB are about color, and crop is handled separately -> No need to trasnform pose heatmap.
+        # raise NotImplementedError(modality)
 
     else:
         raise NotImplementedError(modality)

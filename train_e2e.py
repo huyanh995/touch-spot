@@ -104,7 +104,7 @@ def get_args():
 
     parser.add_argument('--dilate_len', type=int, default=0,
                         help='Label dilation when training')
-    parser.add_argument('--mixup', type=bool, default=True)
+    parser.add_argument('--mixup', type=bool, default=False) # remove mixup for Pose
 
     parser.add_argument('-j', '--num_workers', type=int,
                         help='Base number of dataloader workers')
@@ -123,7 +123,7 @@ class E2EModel(BaseRGBModel):
                      modality):
             super().__init__()
             is_rgb = modality == 'rgb'
-            in_channels = {"flow": 2, "bw": 1, "rgb": 3, "twostream": 5}[modality]
+            in_channels = {"flow": 2, "bw": 1, "rgb": 3, "twostream": 5, "pose": 3}[modality]
             # Expand to 5 channels for flow + rgb
 
             if feature_arch.startswith(('rn18', 'rn50')):
@@ -136,6 +136,7 @@ class E2EModel(BaseRGBModel):
                 # print(torchsummary.summary(features.to('cuda'), (3, 224, 224)))
 
                 # Flow has only two input channels
+                # Pose has separate stream to handle -> the main stream is RGB
                 if not is_rgb:
                     #FIXME: args maybe wrong for larger resnet
                     features.conv1 = nn.Conv2d(
@@ -167,6 +168,28 @@ class E2EModel(BaseRGBModel):
             else:
                 raise NotImplementedError(feature_arch)
 
+            # For pose: (B, 42, H, W) -> (B, 768)
+            self.pose_encoder = nn.Sequential(
+                # First conv block
+                nn.Conv2d(42, 128, kernel_size=3, stride=2, padding=1),
+                nn.BatchNorm2d(128),
+                nn.ReLU(inplace=True),
+
+                # Second conv block
+                nn.Conv2d(128, 256, kernel_size=3, stride=2, padding=1),
+                nn.BatchNorm2d(256),
+                nn.ReLU(inplace=True),
+
+                # Global average pooling
+                nn.AdaptiveAvgPool2d(1),
+
+                # Flatten
+                nn.Flatten(),
+
+                # Final FC layer
+                nn.Linear(256, 768)
+            )
+
             # Add Temporal Shift Modules
             self._require_clip_len = -1
             if feature_arch.endswith('_tsm'):
@@ -175,6 +198,8 @@ class E2EModel(BaseRGBModel):
             elif feature_arch.endswith('_gsm'):
                 make_temporal_shift(features, clip_len, is_gsm=True)
                 self._require_clip_len = clip_len
+
+            feat_dim = feat_dim + 768 # 768 for pose # DEBUG >>>
 
             self._features = features
             self._feat_dim = feat_dim
@@ -214,10 +239,25 @@ class E2EModel(BaseRGBModel):
                         x, (0,) * 7 + (self._require_clip_len - true_clip_len,))
                     clip_len = self._require_clip_len
 
-            im_feat = self._features(
-                x.view(-1, channels, height, width)
-            ).reshape(batch_size, clip_len, self._feat_dim)
+            img = x[:, :, :3, :, :]
+            pose = x[:, :, 3:, :, :]
+            # im_feat = self._features(
+            #     x.view(-1, channels, height, width)
+            # ).reshape(batch_size, clip_len, self._feat_dim)
 
+            im_feat = self._features(
+                img.view(-1, 3, height, width)
+            ).reshape(batch_size, clip_len, self._feat_dim - 768) # (B, T, 768)
+
+            # Scale down pose to 1/2 -> save computation
+            pose = F.interpolate(
+                pose.view(-1, 42, height, width), size =(height // 2, width // 2),
+                mode='bilinear', align_corners=False)
+
+            pose_feat = self.pose_encoder(pose).reshape(batch_size, clip_len, 768)
+            # pose_feat = self.pose_encoder(pose.view(-1, 42, height, width)).reshape(batch_size, clip_len, 768)
+
+            im_feat = torch.cat((im_feat, pose_feat), dim=2) # (B, T, 768 + 768)
             if true_clip_len != clip_len:
                 # Undo padding
                 im_feat = im_feat[:, :true_clip_len, :]
