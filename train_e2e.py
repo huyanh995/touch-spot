@@ -262,7 +262,12 @@ class E2EModel(BaseRGBModel):
                 # Undo padding
                 im_feat = im_feat[:, :true_clip_len, :]
 
+            # print("DEBUG >>>", im_feat.shape, im_feat.dtype, im_feat.device, im_feat.is_contiguous())
             return self._pred_fine(im_feat)
+
+            # with torch.cuda.amp.autocast(enabled=False):  # Always disable mixed precision for GRU
+            #     out = self._pred_fine(im_feat.float())
+            # return out
 
         def print_stats(self):
             print('Model params:',
@@ -302,6 +307,7 @@ class E2EModel(BaseRGBModel):
         epoch_loss = 0.
         with torch.no_grad() if optimizer is None else nullcontext():
             for batch_idx, batch in enumerate(tqdm(loader)):
+                # print("DEBUG >>> Getting one batch")
                 frame = loader.dataset.load_frame_gpu(batch, self.device)
                 label = batch['label'].to(self.device)
 
@@ -363,7 +369,8 @@ def evaluate(model, dataset, split, classes, save_pred, calc_stats=True,
     batch_size = 1 if dataset.augment else INFERENCE_BATCH_SIZE
 
     for clip in tqdm(DataLoader(
-            dataset, num_workers=BASE_NUM_WORKERS * 2, pin_memory=True,
+            dataset, num_workers=BASE_NUM_WORKERS * 2,
+            pin_memory=False,
             batch_size=batch_size
     )):
         if batch_size > 1:
@@ -587,11 +594,13 @@ def main(args):
     loader_batch_size = args.batch_size // args.acc_grad_iter
     train_loader = DataLoader(
         train_data, shuffle=False, batch_size=loader_batch_size,
-        pin_memory=True, num_workers=get_num_train_workers(args),
+        pin_memory=False, # Set to False to avoid Seg Fault since the batch mem size is large
+        num_workers=get_num_train_workers(args),
         prefetch_factor=1, worker_init_fn=worker_init_fn)
     val_loader = DataLoader(
         val_data, shuffle=False, batch_size=loader_batch_size,
-        pin_memory=True, num_workers=BASE_NUM_WORKERS,
+        pin_memory=False,
+        num_workers=BASE_NUM_WORKERS,
         worker_init_fn=worker_init_fn)
 
     model = E2EModel(

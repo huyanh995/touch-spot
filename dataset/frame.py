@@ -4,6 +4,7 @@ import copy
 import json
 import os
 import random
+import time
 
 import numpy as np
 import torch
@@ -96,6 +97,54 @@ class FrameReader:
             heatmap[21:, :, :] = 0.05
         return heatmap
 
+
+    def gaussian_pose_2(self, pose, size, dtype=torch.float32, sigma=3):
+        heatmap = torch.zeros((42, *size), dtype=dtype, device='cpu')
+        height, width = size
+        sigma_sq_2 = 2 * sigma * sigma
+        kernel_size = int(6 * sigma + 3)
+        radius = kernel_size // 2
+
+        # Precompute Gaussian kernel
+        y = torch.arange(-radius, radius + 1, device='cpu', dtype=dtype)
+        x = torch.arange(-radius, radius + 1, device='cpu', dtype=dtype)
+        yy, xx = torch.meshgrid(y, x, indexing='ij')
+        gaussian = torch.exp(-(xx**2 + yy**2) / sigma_sq_2)
+
+        def draw_keypoints(keypoints, offset):
+            for idx, (x_center, y_center) in enumerate(keypoints):
+                if x_center is None or y_center is None:
+                    continue
+                x_center, y_center = int(x_center), int(y_center)
+                if not (0 <= x_center < width and 0 <= y_center < height):
+                    continue
+
+                x0 = max(0, x_center - radius)
+                y0 = max(0, y_center - radius)
+                x1 = min(width, x_center + radius + 1)
+                y1 = min(height, y_center + radius + 1)
+
+                g_x0 = radius - (x_center - x0)
+                g_y0 = radius - (y_center - y0)
+                g_x1 = g_x0 + (x1 - x0)
+                g_y1 = g_y0 + (y1 - y0)
+
+                heatmap[offset + idx, y0:y1, x0:x1] = torch.maximum(
+                    heatmap[offset + idx, y0:y1, x0:x1],
+                    gaussian[g_y0:g_y1, g_x0:g_x1]
+                )
+
+        if 'left' in pose:
+            draw_keypoints(pose['left'], offset=0)
+        else:
+            heatmap[:21, :, :] = 0.05
+
+        if 'right' in pose:
+            draw_keypoints(pose['right'], offset=21)
+        else:
+            heatmap[21:, :, :] = 0.05
+
+        return heatmap
     # def gaussian_pose(self, pose, size, dtype=torch.float32, sigma=3, scale_factor=4):
     #     """
     #     Generate Gaussian heatmaps for pose keypoints.
@@ -173,6 +222,7 @@ class FrameReader:
         n_pad_end = 0
         with open(os.path.join(self._pose_dir, f'{video_name}.json'), 'r') as f:
             pose_data = json.load(f)
+        # start_time = time.time()
         for frame_num in range(start, end, stride):
             if randomize and stride > 1:
                 frame_num += random.randint(0, stride - 1)
@@ -188,13 +238,14 @@ class FrameReader:
                 if self._modality == 'twostream':
                     img, second = self.read_rgb_flow(frame_path)
                 else:
-                    img = self.read_frame(frame_path)
+                    img = self.read_frame(frame_path) # (3, H, W)
                     if os.path.basename(frame_path) in pose_data:
                         _data = pose_data[os.path.basename(frame_path)]
                     else:
                         _data = {}
 
-                    second = self.gaussian_pose(_data, list(img.shape[-2:]))
+                    second = self.gaussian_pose_2(_data, list(img.shape[-2:])) # (42, H, W)
+
                 if self._crop_transform:
                     if self._same_transform:
                         if rand_crop_state is None:
@@ -204,14 +255,20 @@ class FrameReader:
                             random.setstate(rand_crop_state)
 
                     # Need to combine before cropping
-                    if second is not None:
-                        img = torch.cat((img, second), dim=0)
-                        img = self._crop_transform(img)
-                        second = img[3:, :, :].clone()  # Copy pose heatmap
-                        img = img[:3, :, :].clone()  # Only keep RGB channels
-                    else:
-                        img = self._crop_transform(img)
-                    # second = self._crop_transform(second) if second is not None else None
+                    img = self._crop_transform(img)
+
+                    # Restore the same seed and crop
+                    random.setstate(rand_crop_state)
+                    second = self._crop_transform(second) # In pose, second always exists
+
+                    # if second is not None:
+                    #     img = torch.cat((img, second), dim=0)
+                    #     img = self._crop_transform(img)
+                    #     second = img[3:, :, :].clone()  # Copy pose heatmap
+                    #     img = img[:3, :, :].clone()  # Only keep RGB channels
+                    # else:
+                    #     img = self._crop_transform(img)
+                    # # second = self._crop_transform(second) if second is not None else None
 
                     if rand_state_backup is not None:
                         # Make sure that rand state still advances
@@ -231,11 +288,11 @@ class FrameReader:
                 ret.append(img)
 
                 ###### Visualize debug #####
-                import matplotlib.pyplot as plt
+                # import matplotlib.pyplot as plt
 
-                # Save RGB image (first 3 channels)
+                # # Save RGB image (first 3 channels)
                 # rgb_img = (img[:3, :, :].clamp(0, 1) * 255).byte()
-                # torchvision.io.write_jpeg(rgb_img, "debug_img.jpg")
+                # torchvision.io.write_jpeg(rgb_img, f"{video_name}_{frame_num}_img_debug.jpg")
 
                 # # Create and normalize pose heatmap from remaining channels
                 # debug_pose = img[3:, :, :].sum(dim=0)
@@ -244,7 +301,7 @@ class FrameReader:
                 # # Save heatmap as clean image
                 # plt.imshow(debug_pose.cpu().numpy(), cmap='inferno')
                 # plt.axis('off')
-                # plt.savefig("debug_pose.jpg", bbox_inches='tight', pad_inches=0)
+                # plt.savefig(f"{video_name}_{frame_num}_pose_debug.jpg", bbox_inches='tight', pad_inches=0)
                 # plt.close()
                 ###### End #####
             except RuntimeError as e:
@@ -267,7 +324,10 @@ class FrameReader:
         if n_pad_start > 0 or (pad and n_pad_end > 0):
             ret = nn.functional.pad(
                 ret, (0, 0, 0, 0, 0, 0, n_pad_start, n_pad_end if pad else 0))
+
+        # print("DEBUG >>> Load frames", time.time() - start_time)
         return ret
+        # return ret.type(torch.float16) # try to save memory
 
 
 # Pad the start/end of videos with empty frames
@@ -612,16 +672,20 @@ class ActionSpotDataset(Dataset):
                     labels[i] = label
 
         frames = self._frame_reader.load_frames(
-            video_meta['video'], base_idx,
-            base_idx + self._clip_len * self._stride, pad=True,
-            stride=self._stride, randomize=not self._is_eval)
+                        video_meta['video'],
+                        base_idx,
+                        base_idx + self._clip_len * self._stride,
+                        pad=True,
+                        stride=self._stride,
+                        randomize=not self._is_eval # TODO not sure the purpose of this one
+                        )
 
         return {'frame': frames, 'contains_event': int(np.sum(labels) > 0),
                 'label': labels}
 
     def __getitem__(self, unused):
         ret = self._get_one()
-
+        # print("DEBUG >>> Get one clip", ret['frame'].shape)
         if self._mixup:
             mix = self._get_one()    # Sample another clip
             l = random.betavariate(0.2, 0.2)
