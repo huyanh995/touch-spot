@@ -258,7 +258,9 @@ class FrameReader:
                     img = self._crop_transform(img)
 
                     # Restore the same seed and crop
-                    random.setstate(rand_crop_state)
+                    if rand_crop_state is not None:
+                        # During evaluation/inference, CenterCrop is used instead of RandomCrop
+                        random.setstate(rand_crop_state)
                     second = self._crop_transform(second) # In pose, second always exists
 
                     # if second is not None:
