@@ -122,7 +122,7 @@ class E2EModel(BaseRGBModel):
         def __init__(self, num_classes, feature_arch, temporal_arch, clip_len,
                      modality):
             super().__init__()
-            is_rgb = modality == 'rgb'
+            is_rgb = modality in ['rgb', 'twostream', 'pose']
             in_channels = {"flow": 2, "bw": 1, "rgb": 3, "twostream": 5, "pose": 3}[modality]
             # Expand to 5 channels for flow + rgb
 
@@ -137,7 +137,8 @@ class E2EModel(BaseRGBModel):
 
                 # Flow has only two input channels
                 # Pose has separate stream to handle -> the main stream is RGB
-                if not is_rgb:
+                # if not is_rgb:
+                if in_channels != 3:
                     #FIXME: args maybe wrong for larger resnet
                     features.conv1 = nn.Conv2d(
                         in_channels, 64, kernel_size=(7, 7), stride=(2, 2),

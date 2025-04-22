@@ -35,6 +35,7 @@ class FrameReader:
                  same_transform, second_stream_transforms=None):
         self._frame_dir = frame_dir
         self._pose_dir = os.path.join(os.path.dirname(frame_dir), 'mediapipe_hand_pose')
+        # self._pose_dir = os.path.join(os.path.dirname(frame_dir), 'precompute_pose_heatmap')
         self._modality = modality
         self._is_flow = modality == 'flow'
         self._crop_transform = crop_transform
@@ -60,45 +61,6 @@ class FrameReader:
         raise NotImplementedError('Pose not implemented yet!')
 
     def gaussian_pose(self, pose, size, dtype=torch.float32, sigma=3):
-        heatmap = torch.zeros((42, *size), dtype=dtype)
-        height, width = size
-        # Pre-compute constants for efficiency
-        sigma_sq_2 = 2 * sigma * sigma
-        kernel_size = int(6 * sigma + 3)
-        if 'left' in pose:
-            for idx, (x, y) in enumerate(pose['left']):
-                if x is not None and y is not None and 0 <= x < width and 0 <= y < height:
-                    # Calculate window boundaries
-                    x0 = max(0, x - kernel_size // 2)
-                    y0 = max(0, y - kernel_size // 2)
-                    x1 = min(width, x + kernel_size // 2 + 1)
-                    y1 = min(height, y + kernel_size // 2 + 1)
-                    # Generate Gaussian
-                    for map_y in range(y0, y1):
-                        for map_x in range(x0, x1):
-                            d2 = (map_x - x) ** 2 + (map_y - y) ** 2
-                            heatmap[idx, map_y, map_x] = torch.exp(torch.tensor(-d2 / sigma_sq_2))
-        else:
-            heatmap[:21, :, :] = 0.05  # a small constant value for better gradient
-        if 'right' in pose:
-            for idx, (x, y) in enumerate(pose['right']):
-                if x is not None and y is not None and 0 <= x < width and 0 <= y < height:
-                    # Calculate window boundaries
-                    x0 = max(0, x - kernel_size // 2)
-                    y0 = max(0, y - kernel_size // 2)
-                    x1 = min(width, x + kernel_size // 2 + 1)
-                    y1 = min(height, y + kernel_size // 2 + 1)
-                    # Generate Gaussian
-                    for map_y in range(y0, y1):
-                        for map_x in range(x0, x1):
-                            d2 = (map_x - x) ** 2 + (map_y - y) ** 2
-                            heatmap[idx + 21, map_y, map_x] = torch.exp(torch.tensor(-d2 / sigma_sq_2))
-        else:
-            heatmap[21:, :, :] = 0.05
-        return heatmap
-
-
-    def gaussian_pose_2(self, pose, size, dtype=torch.float32, sigma=3):
         heatmap = torch.zeros((42, *size), dtype=dtype, device='cpu')
         height, width = size
         sigma_sq_2 = 2 * sigma * sigma
@@ -145,73 +107,6 @@ class FrameReader:
             heatmap[21:, :, :] = 0.05
 
         return heatmap
-    # def gaussian_pose(self, pose, size, dtype=torch.float32, sigma=3, scale_factor=4):
-    #     """
-    #     Generate Gaussian heatmaps for pose keypoints.
-
-    #     Args:
-    #         pose: Dictionary containing 'left' and 'right' keypoints
-    #         size: Tuple (height, width) for the output heatmap
-    #         dtype: Torch data type for the output tensor
-    #         sigma: Standard deviation for Gaussian kernel
-    #         scale_factor: Downscaling factor (4 for quarter size, 2 for half size)
-
-    #     Returns:
-    #         Tensor of shape (42, height, width) containing the heatmaps
-    #     """
-    #     heatmap = torch.zeros((42, *size), dtype=dtype)
-    #     height, width = size
-
-    #     # Scale the sigma proportionally to the scale factor
-    #     scaled_sigma = sigma / scale_factor
-
-    #     # Pre-compute constants for efficiency with scaled sigma
-    #     sigma_sq_2 = 2 * scaled_sigma * scaled_sigma
-    #     kernel_size = int(6 * scaled_sigma + 3)
-
-    #     if 'left' in pose:
-    #         for idx, (x, y) in enumerate(pose['left']):
-    #             if x is not None and y is not None:
-    #                 # Downscale coordinates by the scale factor
-    #                 x_scaled = x // scale_factor
-    #                 y_scaled = y // scale_factor
-
-    #                 if 0 <= x_scaled < width and 0 <= y_scaled < height:
-    #                     # Calculate window boundaries
-    #                     x0 = max(0, x_scaled - kernel_size // 2)
-    #                     y0 = max(0, y_scaled - kernel_size // 2)
-    #                     x1 = min(width, x_scaled + kernel_size // 2 + 1)
-    #                     y1 = min(height, y_scaled + kernel_size // 2 + 1)
-    #                     # Generate Gaussian
-    #                     for map_y in range(y0, y1):
-    #                         for map_x in range(x0, x1):
-    #                             d2 = (map_x - x_scaled) ** 2 + (map_y - y_scaled) ** 2
-    #                             heatmap[idx, map_y, map_x] = torch.exp(torch.tensor(-d2 / sigma_sq_2))
-    #     else:
-    #         heatmap[:21, :, :] = 0.05  # a small constant value for better gradient
-
-    #     if 'right' in pose:
-    #         for idx, (x, y) in enumerate(pose['right']):
-    #             if x is not None and y is not None:
-    #                 # Downscale coordinates by the scale factor
-    #                 x_scaled = x // scale_factor
-    #                 y_scaled = y // scale_factor
-
-    #                 if 0 <= x_scaled < width and 0 <= y_scaled < height:
-    #                     # Calculate window boundaries
-    #                     x0 = max(0, x_scaled - kernel_size // 2)
-    #                     y0 = max(0, y_scaled - kernel_size // 2)
-    #                     x1 = min(width, x_scaled + kernel_size // 2 + 1)
-    #                     y1 = min(height, y_scaled + kernel_size // 2 + 1)
-    #                     # Generate Gaussian
-    #                     for map_y in range(y0, y1):
-    #                         for map_x in range(x0, x1):
-    #                             d2 = (map_x - x_scaled) ** 2 + (map_y - y_scaled) ** 2
-    #                             heatmap[idx + 21, map_y, map_x] = torch.exp(torch.tensor(-d2 / sigma_sq_2))
-    #     else:
-    #         heatmap[21:, :, :] = 0.05
-
-    #     return heatmap
 
     def load_frames(self, video_name, start, end, pad=False, stride=1,
                     randomize=False):
@@ -222,6 +117,10 @@ class FrameReader:
         n_pad_end = 0
         with open(os.path.join(self._pose_dir, f'{video_name}.json'), 'r') as f:
             pose_data = json.load(f)
+
+        # Load directly from torch precomputed tensor
+        # pose_data = torch.load(os.path.join(self._pose_dir, f'{video_name}.pt')).to_dense()
+
         # start_time = time.time()
         for frame_num in range(start, end, stride):
             if randomize and stride > 1:
@@ -244,7 +143,8 @@ class FrameReader:
                     else:
                         _data = {}
 
-                    second = self.gaussian_pose_2(_data, list(img.shape[-2:])) # (42, H, W)
+                    second = self.gaussian_pose(_data, list(img.shape[-2:])) # (42, H, W)
+                    # second = pose_data[frame_num] # (42, H, W)
 
                 if self._crop_transform:
                     if self._same_transform:
@@ -321,6 +221,7 @@ class FrameReader:
                 # ret = self._img_transform(ret) # TODO split transform here.
                 # No Flip transform here.
                 ret[:, :3, :, :] = self._img_transform(ret[:, :3, :, :]) # the first 3 channels are RGB
+                ret[:, 3:, :, :] = self._second_stream_transforms(ret[:, 3:, :, :]) # the last 42 channels are Pose
 
         # Always pad start, but only pad end if requested
         if n_pad_start > 0 or (pad and n_pad_end > 0):
@@ -334,7 +235,6 @@ class FrameReader:
 
 # Pad the start/end of videos with empty frames
 DEFAULT_PAD_LEN = 5
-
 
 def _get_deferred_rgb_transform():
     img_transforms = [
@@ -519,6 +419,7 @@ def _get_img_transforms(
             ])
     elif modality == 'pose':
         img_transforms = _rgb_transforms(is_eval, defer_transform) # comment out random flip now
+        second_stream_transforms.append(transforms.Normalize(mean=[0.5]*42, std=[0.5]*42))
         # Since all the transforms on RGB are about color, and crop is handled separately -> No need to trasnform pose heatmap.
         # raise NotImplementedError(modality)
 
