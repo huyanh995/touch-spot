@@ -309,6 +309,8 @@ class E2EModel(BaseRGBModel):
         with torch.no_grad() if optimizer is None else nullcontext():
             for batch_idx, batch in enumerate(tqdm(loader)):
                 # print("DEBUG >>> Getting one batch")
+                # TODO: Check when the modality is RGB -> Load from GPU.
+                # TODO: Did the same for the Pose dataloader -> Faster loading data.
                 frame = loader.dataset.load_frame_gpu(batch, self.device)
                 label = batch['label'].to(self.device)
 
