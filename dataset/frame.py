@@ -43,6 +43,28 @@ class FrameReader:
         self._same_transform = same_transform
         self._second_stream_transforms = second_stream_transforms
 
+        # Preload the pose json file
+        self._pose_data = {}
+        for js_file in os.listdir(self._pose_dir):
+            if js_file.endswith('.json'):
+                with open(os.path.join(self._pose_dir, js_file), 'r') as f:
+                    self._pose_data[js_file] = json.load(f)
+
+        # Preload the Gaussian kernel
+        sigma = 3
+        sigma_sq_2 = 2 * sigma * sigma
+        kernel_size = int(6 * sigma + 3)
+        radius = kernel_size // 2
+
+        # Precompute Gaussian kernel
+        y = torch.arange(-radius, radius + 1, device='cpu', dtype=torch.float32)
+        x = torch.arange(-radius, radius + 1, device='cpu', dtype=torch.float32)
+        yy, xx = torch.meshgrid(y, x, indexing='ij')
+        gaussian = torch.exp(-(xx**2 + yy**2) / sigma_sq_2)
+
+        self._radius = radius
+        self._gaussian = gaussian
+
     def read_frame(self, frame_path):
         img = torchvision.io.read_image(frame_path).float() / 255
         if self._is_flow:
@@ -63,15 +85,15 @@ class FrameReader:
     def gaussian_pose(self, pose, size, dtype=torch.float32, sigma=3):
         heatmap = torch.zeros((42, *size), dtype=dtype, device='cpu')
         height, width = size
-        sigma_sq_2 = 2 * sigma * sigma
-        kernel_size = int(6 * sigma + 3)
-        radius = kernel_size // 2
+        # sigma_sq_2 = 2 * sigma * sigma
+        # kernel_size = int(6 * sigma + 3)
+        # radius = kernel_size // 2
 
-        # Precompute Gaussian kernel
-        y = torch.arange(-radius, radius + 1, device='cpu', dtype=dtype)
-        x = torch.arange(-radius, radius + 1, device='cpu', dtype=dtype)
-        yy, xx = torch.meshgrid(y, x, indexing='ij')
-        gaussian = torch.exp(-(xx**2 + yy**2) / sigma_sq_2)
+        # # Precompute Gaussian kernel
+        # y = torch.arange(-radius, radius + 1, device='cpu', dtype=dtype)
+        # x = torch.arange(-radius, radius + 1, device='cpu', dtype=dtype)
+        # yy, xx = torch.meshgrid(y, x, indexing='ij')
+        # gaussian = torch.exp(-(xx**2 + yy**2) / sigma_sq_2)
 
         def draw_keypoints(keypoints, offset):
             for idx, (x_center, y_center) in enumerate(keypoints):
@@ -81,19 +103,19 @@ class FrameReader:
                 if not (0 <= x_center < width and 0 <= y_center < height):
                     continue
 
-                x0 = max(0, x_center - radius)
-                y0 = max(0, y_center - radius)
-                x1 = min(width, x_center + radius + 1)
-                y1 = min(height, y_center + radius + 1)
+                x0 = max(0, x_center - self._radius)
+                y0 = max(0, y_center - self._radius)
+                x1 = min(width, x_center + self._radius + 1)
+                y1 = min(height, y_center + self._radius + 1)
 
-                g_x0 = radius - (x_center - x0)
-                g_y0 = radius - (y_center - y0)
+                g_x0 = self._radius - (x_center - x0)
+                g_y0 = self._radius - (y_center - y0)
                 g_x1 = g_x0 + (x1 - x0)
                 g_y1 = g_y0 + (y1 - y0)
 
                 heatmap[offset + idx, y0:y1, x0:x1] = torch.maximum(
                     heatmap[offset + idx, y0:y1, x0:x1],
-                    gaussian[g_y0:g_y1, g_x0:g_x1]
+                    self._gaussian[g_y0:g_y1, g_x0:g_x1]
                 )
 
         if 'left' in pose:
@@ -115,8 +137,10 @@ class FrameReader:
         ret = []
         n_pad_start = 0
         n_pad_end = 0
-        with open(os.path.join(self._pose_dir, f'{video_name}.json'), 'r') as f:
-            pose_data = json.load(f)
+        # with open(os.path.join(self._pose_dir, f'{video_name}.json'), 'r') as f:
+        #     pose_data = json.load(f)
+
+        pose_data = self._pose_data.get(video_name, {})
 
         # Load directly from torch precomputed tensor
         # pose_data = torch.load(os.path.join(self._pose_dir, f'{video_name}.pt')).to_dense()
@@ -143,7 +167,9 @@ class FrameReader:
                     else:
                         _data = {}
 
+                    start_time = time.time()
                     second = self.gaussian_pose(_data, list(img.shape[-2:])) # (42, H, W)
+                    print("DEBUG >>> Load pose", time.time() - start_time)
                     # second = pose_data[frame_num] # (42, H, W)
 
                 if self._crop_transform:
