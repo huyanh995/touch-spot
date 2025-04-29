@@ -134,7 +134,7 @@ def compute_mAPs(truth, pred, tolerances=[0, 1, 2, 4], plot_pr=False):
 
     print("Avg mAP (across tolerances): {:0.2f}".format(np.mean(mAPs) * 100))
 
-    plot_pr = False # DEBUG >>>
+    plot_pr = True # DEBUG >>>
     if plot_pr:
         for i, tol in enumerate(tolerances):
             for j, label in enumerate(sorted(truth_by_label.keys())):

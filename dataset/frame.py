@@ -167,9 +167,9 @@ class FrameReader:
                     else:
                         _data = {}
 
-                    start_time = time.time()
+                    # start_time = time.time()
                     second = self.gaussian_pose(_data, list(img.shape[-2:])) # (42, H, W)
-                    print("DEBUG >>> Load pose", time.time() - start_time)
+                    # print("DEBUG >>> Load pose", time.time() - start_time)
                     # second = pose_data[frame_num] # (42, H, W)
 
                 if self._crop_transform:
