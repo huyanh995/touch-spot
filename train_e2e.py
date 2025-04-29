@@ -83,6 +83,8 @@ def get_args():
         choices=['', 'gru', 'deeper_gru', 'mstcn', 'asformer'],
         help='Spotting architecture, after spatial pooling')
 
+    parser.add_argument('--ckpt', type=str, default=None, help="Path to checkpoint E2E spot")
+
     parser.add_argument('--clip_len', type=int, default=100)
     parser.add_argument('--crop_dim', type=int, default=224)
     parser.add_argument('--batch_size', type=int, default=8)
@@ -558,6 +560,12 @@ def main(args):
         len(classes) + 1, args.feature_arch, args.temporal_arch,
         clip_len=args.clip_len, modality=args.modality,
         multi_gpu=args.gpu_parallel)
+
+    # Optional: load check point from previous training (e.g E2E_data_v3 to E2E_data_v4)
+    if args.ckpt is not None:
+        print('>>> Loading checkpoint from', args.ckpt)
+        model.load(torch.load(args.ckpt))
+
     optimizer, scaler = model.get_optimizer({'lr': args.learning_rate})
 
     # Warmup schedule

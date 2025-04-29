@@ -13,6 +13,7 @@ DATASETS = [
     "touch",
     "touch_v2",
     "touch_v3",
+    "touch_v4",
 ]
 
 
