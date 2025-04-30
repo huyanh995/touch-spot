@@ -592,7 +592,7 @@ def main(args):
         train_loss = model.epoch(
             train_loader, optimizer, scaler,
             lr_scheduler=lr_scheduler, acc_grad_iter=args.acc_grad_iter, fg_weight=args.fg_weight)
-        val_loss = model.epoch(val_loader, acc_grad_iter=args.acc_grad_iter)
+        val_loss = model.epoch(val_loader, acc_grad_iter=args.acc_grad_iter, fg_weight=args.fg_weight)
         print('[Epoch {}] Train loss: {:0.5f} Val loss: {:0.5f}'.format(
             epoch, train_loss, val_loss))
 
