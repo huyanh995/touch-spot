@@ -110,6 +110,8 @@ def get_args():
 
     parser.add_argument('-j', '--num_workers', type=int,
                         help='Base number of dataloader workers')
+    parser.add_argument('--fg_weight', type=float, default=5.0,
+                        help='Weight for the foreground class')
 
     # Sample based on foreground
     parser.add_argument('--fg_upsample', type=float)
@@ -124,7 +126,7 @@ class E2EModel(BaseRGBModel):
         def __init__(self, num_classes, feature_arch, temporal_arch, clip_len,
                      modality):
             super().__init__()
-            is_rgb = modality == 'rgb'
+            is_rgb = modality == "rgb"
             in_channels = {"flow": 2, "bw": 1, "rgb": 3, "twostream": 5}[modality]
             # Expand to 5 channels for flow + rgb
 
@@ -589,7 +591,7 @@ def main(args):
     for epoch in range(epoch, num_epochs):
         train_loss = model.epoch(
             train_loader, optimizer, scaler,
-            lr_scheduler=lr_scheduler, acc_grad_iter=args.acc_grad_iter)
+            lr_scheduler=lr_scheduler, acc_grad_iter=args.acc_grad_iter, fg_weight=args.fg_weight)
         val_loss = model.epoch(val_loader, acc_grad_iter=args.acc_grad_iter)
         print('[Epoch {}] Train loss: {:0.5f} Val loss: {:0.5f}'.format(
             epoch, train_loss, val_loss))
