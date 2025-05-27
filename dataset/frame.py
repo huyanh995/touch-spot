@@ -111,7 +111,10 @@ class FrameReader:
                 n_pad_end += 1
 
         # In the multicrop case, the shape is (B, T, C, H, W)
-        ret = torch.stack(ret, dim=int(len(ret[0].shape) == 4)) # DEBUG (40, 5, 224, 224)
+        try:
+            ret = torch.stack(ret, dim=int(len(ret[0].shape) == 4)) # DEBUG (40, 5, 224, 224)
+        except IndexError:
+            print("DEBUG >>>")
         if self._same_transform:
             if self._modality == 'twostream':
                 ret[:, :3, :, :] = self._img_transform(ret[:, :3, :, :]) # the first 3 channels are RGB

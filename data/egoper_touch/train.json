@@ -1,0 +1,3047 @@
+[
+    {
+        "video": "coffee_u1_a1_normal_002_34-067",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 123,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_002_49-000",
+        "num_frames": 150,
+        "num_events": 4,
+        "events": [
+            {
+                "frame": 8,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 41,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 92,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 95,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_002_60-133",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 95,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_002_110-333",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 83,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 125,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_002_146-800",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 92,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_002_167-933",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 80,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 134,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_002_189-067",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 57,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_002_212-733",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 122,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_002_236-267",
+        "num_frames": 150,
+        "num_events": 4,
+        "events": [
+            {
+                "frame": 38,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 68,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 78,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 114,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_002_268-600",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 65,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_002_282-133",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 43,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_002_360-133",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 64,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_002_478-467",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 92,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_004_27-600",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 93,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_004_47-533",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 72,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 127,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_004_65-600",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 114,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_004_83-200",
+        "num_frames": 150,
+        "num_events": 3,
+        "events": [
+            {
+                "frame": 68,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 113,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 132,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_004_108-600",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 75,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_004_123-533",
+        "num_frames": 150,
+        "num_events": 4,
+        "events": [
+            {
+                "frame": 30,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 61,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 76,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 108,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_004_143-867",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 96,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 122,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_004_162-667",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 63,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 139,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_004_322-333",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 98,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 112,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_004_411-867",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 48,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_004_437-733",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 38,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_004_481-933",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 66,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_004_563-333",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 71,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_004_699-133",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 75,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 84,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_003_25-000",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 96,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_003_35-667",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 11,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 87,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_003_91-933",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 81,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 138,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_003_126-933",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 73,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_003_141-933",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 104,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 149,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_003_157-000",
+        "num_frames": 150,
+        "num_events": 4,
+        "events": [
+            {
+                "frame": 30,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 85,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 107,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 132,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_003_184-800",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 120,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 123,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_003_218-933",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 46,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 85,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_003_429-000",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 42,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_003_448-400",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 22,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_003_547-600",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 117,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_003_716-600",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 13,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 71,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_021_25-000",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 76,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_021_51-400",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 110,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_021_79-200",
+        "num_frames": 150,
+        "num_events": 3,
+        "events": [
+            {
+                "frame": 77,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 107,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 128,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_021_100-400",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 109,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 147,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_021_145-067",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 102,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_021_158-667",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 80,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 128,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_021_179-133",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 86,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 149,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_021_202-733",
+        "num_frames": 150,
+        "num_events": 3,
+        "events": [
+            {
+                "frame": 48,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 100,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 130,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_021_244-867",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 24,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_021_293-133",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 54,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 114,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_021_387-133",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 68,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_021_541-533",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 63,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_021_550-000",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 79,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_019_45-000",
+        "num_frames": 150,
+        "num_events": 4,
+        "events": [
+            {
+                "frame": 9,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 70,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 111,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 139,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_019_65-333",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 19,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_019_94-133",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 99,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_019_161-800",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 30,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 49,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_019_177-533",
+        "num_frames": 150,
+        "num_events": 5,
+        "events": [
+            {
+                "frame": 60,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 73,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 96,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 128,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 140,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_019_200-800",
+        "num_frames": 150,
+        "num_events": 4,
+        "events": [
+            {
+                "frame": 60,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 94,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 99,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 129,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_019_235-667",
+        "num_frames": 150,
+        "num_events": 3,
+        "events": [
+            {
+                "frame": 25,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 86,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 131,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_019_296-400",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 101,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 119,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_019_332-600",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 106,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_019_357-133",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 105,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_019_366-933",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 106,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_019_416-333",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 36,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 53,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_019_477-067",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 50,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_019_596-733",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 90,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 116,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_019_606-200",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 58,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_018_54-600",
+        "num_frames": 150,
+        "num_events": 6,
+        "events": [
+            {
+                "frame": 40,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 80,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 86,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 107,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 117,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 137,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_018_80-200",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 110,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_018_103-933",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 11,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 16,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_018_142-600",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 84,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 122,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_018_167-933",
+        "num_frames": 150,
+        "num_events": 4,
+        "events": [
+            {
+                "frame": 20,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 57,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 104,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 141,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_018_199-800",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 14,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_018_285-200",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 115,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 124,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_018_339-733",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 87,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_018_384-333",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 130,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_018_549-133",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 122,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_31-067",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 92,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 134,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_46-867",
+        "num_frames": 150,
+        "num_events": 4,
+        "events": [
+            {
+                "frame": 60,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 74,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 123,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 141,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_64-267",
+        "num_frames": 150,
+        "num_events": 4,
+        "events": [
+            {
+                "frame": 72,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 102,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 116,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 130,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_80-467",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 32,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 94,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_115-467",
+        "num_frames": 150,
+        "num_events": 3,
+        "events": [
+            {
+                "frame": 41,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 89,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 110,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_169-733",
+        "num_frames": 150,
+        "num_events": 4,
+        "events": [
+            {
+                "frame": 55,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 74,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 114,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 137,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_186-933",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 135,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_207-533",
+        "num_frames": 150,
+        "num_events": 5,
+        "events": [
+            {
+                "frame": 6,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 17,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 46,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 55,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 132,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_224-400",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 78,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_268-667",
+        "num_frames": 150,
+        "num_events": 4,
+        "events": [
+            {
+                "frame": 55,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 72,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 125,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 143,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_300-400",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 89,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 144,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_329-600",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 117,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_338-200",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 116,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_376-533",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 91,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_426-000",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 98,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_488-733",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 59,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_020_498-600",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 42,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 92,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_001_28-867",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 70,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_001_50-933",
+        "num_frames": 150,
+        "num_events": 4,
+        "events": [
+            {
+                "frame": 13,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 36,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 102,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 148,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_001_134-933",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 37,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 92,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_001_158-600",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 73,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 117,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_001_171-600",
+        "num_frames": 150,
+        "num_events": 3,
+        "events": [
+            {
+                "frame": 20,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 79,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 83,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_001_190-933",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 95,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 146,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_001_231-333",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 21,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 24,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_001_290-267",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 61,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_001_508-467",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 32,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_014_10-000",
+        "num_frames": 150,
+        "num_events": 3,
+        "events": [
+            {
+                "frame": 12,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 37,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 103,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_014_18-933",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 7,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_014_45-000",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 109,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_014_79-867",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 76,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 122,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_014_104-000",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 91,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 102,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_014_116-000",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 82,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 106,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_014_132-933",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 13,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 99,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_014_153-600",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 64,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 101,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_014_219-133",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 35,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 50,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_014_248-000",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 95,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_014_257-667",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 73,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_014_363-200",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 78,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_014_514-200",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 102,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_014_523-467",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 61,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_022_15-400",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 22,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 137,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_022_21-133",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 10,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_022_48-200",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 100,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_022_68-867",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 81,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_022_93-067",
+        "num_frames": 150,
+        "num_events": 3,
+        "events": [
+            {
+                "frame": 16,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 73,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 136,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_022_117-267",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 79,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 116,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_022_137-400",
+        "num_frames": 150,
+        "num_events": 3,
+        "events": [
+            {
+                "frame": 15,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 68,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 137,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_022_158-333",
+        "num_frames": 150,
+        "num_events": 5,
+        "events": [
+            {
+                "frame": 15,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 39,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 55,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 77,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 111,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_022_253-067",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 11,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 80,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_022_338-800",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 61,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_022_430-800",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 17,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_022_528-267",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 24,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_022_538-600",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 45,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 71,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_023_15-333",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 111,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_023_49-733",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 122,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 143,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_023_65-200",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 9,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_023_85-533",
+        "num_frames": 150,
+        "num_events": 3,
+        "events": [
+            {
+                "frame": 39,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 108,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 126,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_023_104-200",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 78,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 98,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_023_125-467",
+        "num_frames": 150,
+        "num_events": 3,
+        "events": [
+            {
+                "frame": 89,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 104,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 149,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_023_151-867",
+        "num_frames": 150,
+        "num_events": 4,
+        "events": [
+            {
+                "frame": 13,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 60,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 78,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 89,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_023_169-200",
+        "num_frames": 150,
+        "num_events": 4,
+        "events": [
+            {
+                "frame": 27,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 33,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 60,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 79,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_023_420-867",
+        "num_frames": 150,
+        "num_events": 3,
+        "events": [
+            {
+                "frame": 8,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 68,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 79,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_023_449-067",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 79,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_023_467-133",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 50,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_023_516-533",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 23,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 57,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_023_570-267",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 50,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_024_09-733",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 41,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 105,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_024_45-200",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 112,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_024_69-200",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 97,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 135,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_024_98-667",
+        "num_frames": 150,
+        "num_events": 5,
+        "events": [
+            {
+                "frame": 16,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 62,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 76,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 119,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 144,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_024_114-933",
+        "num_frames": 150,
+        "num_events": 2,
+        "events": [
+            {
+                "frame": 108,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 126,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_024_132-400",
+        "num_frames": 150,
+        "num_events": 3,
+        "events": [
+            {
+                "frame": 49,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 69,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 96,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_024_158-867",
+        "num_frames": 150,
+        "num_events": 3,
+        "events": [
+            {
+                "frame": 75,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 124,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 143,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_024_266-800",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 94,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_024_310-733",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 18,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_024_336-867",
+        "num_frames": 150,
+        "num_events": 3,
+        "events": [
+            {
+                "frame": 12,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 35,
+                "label": "touch",
+                "comment": ""
+            },
+            {
+                "frame": 90,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_024_357-333",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 82,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_024_428-800",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 103,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    },
+    {
+        "video": "coffee_u1_a1_normal_024_443-200",
+        "num_frames": 150,
+        "num_events": 1,
+        "events": [
+            {
+                "frame": 52,
+                "label": "touch",
+                "comment": ""
+            }
+        ],
+        "fps": 15,
+        "width": 854,
+        "height": 480
+    }
+]
