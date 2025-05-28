@@ -31,7 +31,9 @@ from util.eval import non_maximum_supression, process_frame_predictions
 from util.io import clear_files, load_json, store_gz_json, store_json
 from util.score import compute_mAPs
 
-EPOCH_NUM_FRAMES = 500000
+# EPOCH_NUM_FRAMES = 500000
+
+EPOCH_NUM_FRAMES = 200000
 
 BASE_NUM_WORKERS = 4
 
@@ -41,7 +43,7 @@ INFERENCE_BATCH_SIZE = 4
 
 
 # Prevent the GRU params from going too big (cap it at a RegNet-Y 800MF)
-MAX_GRU_HIDDEN_DIM = 768
+MAX_GRU_HIDDEN_DIM = 768 + 128 # for pose
 
 
 def get_args():
@@ -121,6 +123,65 @@ def get_args():
 
 class E2EModel(BaseRGBModel):
 
+    class PoseGRUEncoder(nn.Module):
+        def __init__(self,
+                    input_dim=18,      # Pose feature dimension per frame
+                    window_size=5,     # Temporal window size
+                    hidden_dim=64,     # GRU hidden dimension
+                    output_dim=128,    # Final output dimension
+                    num_layers=2,      # Number of GRU layers
+                    dropout=0.2):
+            super().__init__()
+
+            self.input_dim = input_dim
+            self.window_size = window_size
+            self.hidden_dim = hidden_dim
+            self.output_dim = output_dim
+
+            # Option 1: Process each 5-frame window with a mini-GRU
+            self.window_gru = nn.GRU(
+                input_size=input_dim,     # 18 features per frame
+                hidden_size=hidden_dim,   # 64 hidden units
+                num_layers=num_layers,    # 2 layers
+                batch_first=True,
+                dropout=dropout if num_layers > 1 else 0
+            )
+
+            # Project to final output dimension
+            self.output_projection = nn.Sequential(
+                nn.Linear(hidden_dim, hidden_dim),
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(hidden_dim, output_dim)
+            )
+
+        def forward(self, pose_windows):
+            """
+            Args:
+                pose_windows: (batch_size, num_frames, window_size, input_dim)
+                            Shape: (B, N, 5, 18)
+            Returns:
+                pose_features: (batch_size, num_frames, output_dim)
+                            Shape: (B, N, 128)
+            """
+            batch_size, num_frames, window_size, input_dim = pose_windows.shape
+
+            # Reshape for GRU processing: (batch_size * num_frames, window_size, input_dim)
+            pose_windows = pose_windows.view(-1, window_size, input_dim)  # (B*N, 5, 18)
+
+            # Process each window through GRU
+            gru_output, hidden = self.window_gru(pose_windows.type(torch.float32))  # output: (B*N, 5, hidden_dim)
+
+            # Use the last output from each sequence (represents trajectory up to current frame)
+            last_output = gru_output[:, -1, :]  # (B*N, hidden_dim)
+
+            # Project to final output dimension
+            pose_features = self.output_projection(last_output)  # (B*N, output_dim)
+
+            # Reshape back to (batch_size, num_frames, output_dim)
+            pose_features = pose_features.view(batch_size, num_frames, -1)  # (B, N, output_dim)
+
+            return pose_features
     class Impl(nn.Module):
 
         def __init__(self, num_classes, feature_arch, temporal_arch, clip_len,
@@ -184,6 +245,7 @@ class E2EModel(BaseRGBModel):
             self._feat_dim = feat_dim
 
             if 'gru' in temporal_arch:
+                feat_dim = feat_dim + 128  # Add pose feature dimension
                 hidden_dim = feat_dim
                 if hidden_dim > MAX_GRU_HIDDEN_DIM:
                     hidden_dim = MAX_GRU_HIDDEN_DIM
@@ -204,7 +266,10 @@ class E2EModel(BaseRGBModel):
             else:
                 raise NotImplementedError(temporal_arch)
 
-        def forward(self, x):
+            # Pose trajectory encoder
+            self.pose_encoder = E2EModel.PoseGRUEncoder() # (B, 128)
+
+        def forward(self, x, pose):
             batch_size, true_clip_len, channels, height, width = x.shape
 
             clip_len = true_clip_len
@@ -220,13 +285,17 @@ class E2EModel(BaseRGBModel):
 
             im_feat = self._features(
                 x.view(-1, channels, height, width)
-            ).reshape(batch_size, clip_len, self._feat_dim)
+            ).reshape(batch_size, clip_len, self._feat_dim) # (B, clip_len, feat_dim), (8, 40, 768)
+
+            pose_feat = self.pose_encoder(pose)
 
             if true_clip_len != clip_len:
                 # Undo padding
                 im_feat = im_feat[:, :true_clip_len, :]
+                pose_feat = pose_feat[:, :true_clip_len, :]
 
-            return self._pred_fine(im_feat)
+            feat = torch.cat((im_feat, pose_feat), dim=-1)  # (B, clip_len, feat_dim + pose_dim)
+            return self._pred_fine(feat)
 
         def print_stats(self):
             print('Model params:',
@@ -267,6 +336,7 @@ class E2EModel(BaseRGBModel):
         with torch.no_grad() if optimizer is None else nullcontext():
             for batch_idx, batch in enumerate(tqdm(loader)):
                 frame = loader.dataset.load_frame_gpu(batch, self.device)
+                pose = batch['pose'].to(self.device)
                 label = batch['label'].to(self.device)
 
                 # Depends on whether mixup is used
@@ -274,7 +344,7 @@ class E2EModel(BaseRGBModel):
                     else label.view(-1, label.shape[-1])
 
                 with torch.cuda.amp.autocast():
-                    pred = self._model(frame)
+                    pred = self._model(frame, pose)
 
                     loss = 0.
                     if len(pred.shape) == 3:
@@ -294,7 +364,7 @@ class E2EModel(BaseRGBModel):
 
         return epoch_loss / len(loader)     # Avg loss
 
-    def predict(self, seq, use_amp=True):
+    def predict(self, seq, pose, use_amp=True):
         if not isinstance(seq, torch.Tensor):
             seq = torch.FloatTensor(seq)
         if len(seq.shape) == 4: # (L, C, H, W)
@@ -305,7 +375,7 @@ class E2EModel(BaseRGBModel):
         self._model.eval()
         with torch.no_grad():
             with torch.cuda.amp.autocast() if use_amp else nullcontext():
-                pred = self._model(seq)
+                pred = self._model(seq, pose.to(self.device))
             if isinstance(pred, tuple):
                 pred = pred[0]
             if len(pred.shape) > 3:
@@ -332,7 +402,7 @@ def evaluate(model, dataset, split, classes, save_pred, calc_stats=True,
     )):
         if batch_size > 1:
             # Batched by dataloader
-            _, batch_pred_scores = model.predict(clip['frame'])
+            _, batch_pred_scores = model.predict(clip['frame'], clip['pose'])
 
             for i in range(clip['frame'].shape[0]):
                 video = clip['video'][i]
@@ -354,7 +424,7 @@ def evaluate(model, dataset, split, classes, save_pred, calc_stats=True,
             scores, support = pred_dict[clip['video'][0]]
 
             start = clip['start'][0].item()
-            _, pred_scores = model.predict(clip['frame'][0])
+            _, pred_scores = model.predict(clip['frame'][0], clip['pose'][0])
             if start < 0:
                 pred_scores = pred_scores[:, -start:, :]
                 start = 0
@@ -638,6 +708,7 @@ def main(args):
                                 'optim_{:03d}.pt'.format(epoch)))
             store_config(os.path.join(args.save_dir, 'config.json'),
                             args, num_epochs, classes)
+
 
     print('Best epoch: {}\n'.format(best_epoch))
 

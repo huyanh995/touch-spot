@@ -38,6 +38,11 @@ class FrameReader:
         self._img_transform = img_transform
         self._same_transform = same_transform
         self._second_stream_transforms = second_stream_transforms
+        self._pose_dir = os.path.join(os.path.dirname(frame_dir), "poses")
+        self._poses = {}
+        for vid in os.listdir(self._pose_dir):
+            if not vid.startswith('.'):
+                self._poses[vid.replace('.npy', '')] = np.load(os.path.join(self._pose_dir, vid))
 
     def read_frame(self, frame_path):
         img = torchvision.io.read_image(frame_path).float() / 255
@@ -57,30 +62,126 @@ class FrameReader:
         raise NotImplementedError('Pose not implemented yet!')
 
 
+    # def load_frames(self, video_name, start, end, pad=False, stride=1,
+    #                 randomize=False):
+    #     rand_crop_state = None
+    #     rand_state_backup = None
+    #     ret = []
+    #     poses = []
+    #     n_pad_start = 0
+    #     n_pad_end = 0
+    #     vid_pose = self._poses[video_name]
+    #     for frame_num in range(start, end, stride):
+    #         if randomize and stride > 1:
+    #             frame_num += random.randint(0, stride - 1)
+
+    #         if frame_num < 0:
+    #             n_pad_start += 1
+    #             continue
+
+    #         frame_path = os.path.join(
+    #             self._frame_dir, video_name,
+    #             FrameReader.IMG_NAME.format(frame_num))
+    #         try:
+    #             if self._modality == 'twostream':
+    #                 img, second = self.read_rgb_flow(frame_path)
+    #             else:
+    #                 img = self.read_frame(frame_path)
+    #                 second = None
+    #             if self._crop_transform:
+    #                 if self._same_transform:
+    #                     if rand_crop_state is None:
+    #                         rand_crop_state = random.getstate()
+    #                     else:
+    #                         rand_state_backup = random.getstate()
+    #                         random.setstate(rand_crop_state)
+
+    #                 img = self._crop_transform(img)
+    #                 second = self._crop_transform(second) if second is not None else None
+
+    #                 if rand_state_backup is not None:
+    #                     # Make sure that rand state still advances
+    #                     random.setstate(rand_state_backup)
+    #                     rand_state_backup = None
+
+    #             if not self._same_transform:
+    #                 img = self._img_transform(img)
+    #                 second = self._second_stream_transforms(second) if second is not None else None
+
+    #             if second is not None:
+    #                 # Merge RGB and Flow together
+    #                 img = torch.cat((img, second), dim=0)
+
+    #             ret.append(img)
+    #             poses.append(vid_pose[frame_num])
+    #         except RuntimeError:
+    #             # print('Missing file!', frame_path)
+    #             n_pad_end += 1
+
+    #     # In the multicrop case, the shape is (B, T, C, H, W)
+    #     try:
+    #         ret = torch.stack(ret, dim=int(len(ret[0].shape) == 4)) # DEBUG (40, 5, 224, 224)
+    #     except IndexError:
+    #         print("DEBUG >>>")
+    #     if self._same_transform:
+    #         if self._modality == 'twostream':
+    #             ret[:, :3, :, :] = self._img_transform(ret[:, :3, :, :]) # the first 3 channels are RGB
+    #             ret[:, 3:, :, :] = self._second_stream_transforms(ret[:, 3:, :, :]) # the last 2 channels are Flow
+    #         else:
+    #             ret = self._img_transform(ret)
+
+    #     # Always pad start, but only pad end if requested
+    #     if n_pad_start > 0 or (pad and n_pad_end > 0):
+    #         ret = nn.functional.pad(
+    #             ret, (0, 0, 0, 0, 0, 0, n_pad_start, n_pad_end if pad else 0))
+    #     return ret
+
     def load_frames(self, video_name, start, end, pad=False, stride=1,
                     randomize=False):
         rand_crop_state = None
         rand_state_backup = None
         ret = []
+        pose_windows = []  # Store 5-frame windows
         n_pad_start = 0
         n_pad_end = 0
+        vid_pose = self._poses[video_name]
+
+        # SIMPLIFIED: Create pose window for ANY frame_num (even negative/beyond range)
+        def create_window_for_frame(frame_num):
+            window = []
+            for offset in range(-2, 3):  # -2, -1, 0, 1, 2
+                idx = frame_num + offset
+                if idx < 0:
+                    window.append(vid_pose[0] if len(vid_pose) > 0 else np.zeros(18))
+                elif idx >= len(vid_pose):
+                    window.append(vid_pose[-1] if len(vid_pose) > 0 else np.zeros(18))
+                else:
+                    window.append(vid_pose[idx])
+            return np.stack(window)  # Shape: (5, 18)
+
         for frame_num in range(start, end, stride):
             if randomize and stride > 1:
                 frame_num += random.randint(0, stride - 1)
 
+            # ALWAYS create pose window first
+            pose_window = create_window_for_frame(frame_num)
+
             if frame_num < 0:
                 n_pad_start += 1
+                pose_windows.append(pose_window)
                 continue
 
             frame_path = os.path.join(
                 self._frame_dir, video_name,
                 FrameReader.IMG_NAME.format(frame_num))
+
             try:
                 if self._modality == 'twostream':
                     img, second = self.read_rgb_flow(frame_path)
                 else:
                     img = self.read_frame(frame_path)
                     second = None
+
                 if self._crop_transform:
                     if self._same_transform:
                         if rand_crop_state is None:
@@ -88,10 +189,8 @@ class FrameReader:
                         else:
                             rand_state_backup = random.getstate()
                             random.setstate(rand_crop_state)
-
                     img = self._crop_transform(img)
                     second = self._crop_transform(second) if second is not None else None
-
                     if rand_state_backup is not None:
                         # Make sure that rand state still advances
                         random.setstate(rand_state_backup)
@@ -106,29 +205,40 @@ class FrameReader:
                     img = torch.cat((img, second), dim=0)
 
                 ret.append(img)
-            except RuntimeError:
-                # print('Missing file!', frame_path)
-                n_pad_end += 1
+                pose_windows.append(pose_window)
 
-        # In the multicrop case, the shape is (B, T, C, H, W)
+            except (RuntimeError, FileNotFoundError, IndexError):
+                # Handle missing frame - but still add the pose window
+                n_pad_end += 1
+                pose_windows.append(pose_window)
+
+        # Stack frames
         try:
-            ret = torch.stack(ret, dim=int(len(ret[0].shape) == 4)) # DEBUG (40, 5, 224, 224)
+            ret = torch.stack(ret, dim=int(len(ret[0].shape) == 4))
         except IndexError:
-            print("DEBUG >>>")
+            print("DEBUG >>> Empty ret list")
+            dummy_shape = (0, 3, 224, 224) if self._modality != 'twostream' else (0, 5, 224, 224)
+            ret = torch.empty(dummy_shape)
+
+        # Stack pose windows - should always match the loop iterations
+        pose_windows = np.stack(pose_windows, axis=0) if pose_windows else np.empty((0, 5, 18))
+
         if self._same_transform:
             if self._modality == 'twostream':
-                ret[:, :3, :, :] = self._img_transform(ret[:, :3, :, :]) # the first 3 channels are RGB
-                ret[:, 3:, :, :] = self._second_stream_transforms(ret[:, 3:, :, :]) # the last 2 channels are Flow
+                ret[:, :3, :, :] = self._img_transform(ret[:, :3, :, :])
+                ret[:, 3:, :, :] = self._second_stream_transforms(ret[:, 3:, :, :])
             else:
                 ret = self._img_transform(ret)
 
-        # Always pad start, but only pad end if requested
+        # Pad frames to match pose_windows length
         if n_pad_start > 0 or (pad and n_pad_end > 0):
             ret = nn.functional.pad(
                 ret, (0, 0, 0, 0, 0, 0, n_pad_start, n_pad_end if pad else 0))
-        return ret
 
+        # SIMPLE CHECK: Both should have same length now
+        assert len(pose_windows) == ret.shape[0], f"Length mismatch: poses={len(pose_windows)}, frames={ret.shape[0]}"
 
+        return ret, pose_windows
 # Pad the start/end of videos with empty frames
 DEFAULT_PAD_LEN = 5
 
@@ -467,12 +577,12 @@ class ActionSpotDataset(Dataset):
                 ):
                     labels[i] = label
 
-        frames = self._frame_reader.load_frames(
+        frames, poses = self._frame_reader.load_frames(
             video_meta['video'], base_idx,
             base_idx + self._clip_len * self._stride, pad=True,
             stride=self._stride, randomize=not self._is_eval)
 
-        return {'frame': frames, 'contains_event': int(np.sum(labels) > 0),
+        return {'frame': frames, 'pose': poses, 'contains_event': int(np.sum(labels) > 0),
                 'label': labels}
 
     def __getitem__(self, unused):
@@ -558,7 +668,7 @@ class ActionSpotVideoDataset(Dataset):
 
     def __getitem__(self, idx):
         video_name, start = self._clips[idx]
-        frames = self._frame_reader.load_frames(
+        frames, poses = self._frame_reader.load_frames(
             video_name, start, start + self._clip_len * self._stride, pad=True,
             stride=self._stride)
 
@@ -566,7 +676,7 @@ class ActionSpotVideoDataset(Dataset):
             frames = torch.stack((frames, frames.flip(-1)), dim=0)
 
         return {'video': video_name, 'start': start // self._stride,
-                'frame': frames}
+                'frame': frames, 'pose': poses}
 
     def get_labels(self, video):
         meta = self._labels[self._video_idxs[video]]
