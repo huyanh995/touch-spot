@@ -324,6 +324,8 @@ def _get_img_transforms(
         second_stream_transforms = torch.jit.script(
             nn.Sequential(*second_stream_transforms))
 
+    # DEBUG >>>
+    crop_transform = None
     return crop_transform, img_transform, second_stream_transforms
 
 

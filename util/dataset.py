@@ -17,6 +17,7 @@ DATASETS = [
     "assembly_touch",
     "egoper_touch",
     "EK_v1",
+    "EK_v1_360p",
 ]
 
 
