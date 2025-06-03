@@ -7,6 +7,9 @@ import random
 import warnings
 from contextlib import nullcontext
 
+# os.environ['NCCL_P2P_DISABLE'] = '1'  # Disable NCCL P2P
+# os.environ['NCCL_IB_DISABLE'] = '1'   # Disable InfiniBand
+# Force PyTorch to use Gloo if any distributed operations are used elsewhere
 import numpy as np
 import torch
 from tabulate import tabulate
