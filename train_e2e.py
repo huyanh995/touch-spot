@@ -31,7 +31,7 @@ from util.eval import non_maximum_supression, process_frame_predictions
 from util.io import clear_files, load_json, store_gz_json, store_json
 from util.score import compute_mAPs
 
-EPOCH_NUM_FRAMES = 500000
+EPOCH_NUM_FRAMES = 500_000
 
 BASE_NUM_WORKERS = 4
 
@@ -397,7 +397,8 @@ def evaluate(model, dataset, split, classes, save_pred, calc_stats=True,
         # mAPs, _ = compute_mAPs(dataset.labels, pred_events_high_recall, plot_pr=True)
         mAPs, _ = compute_mAPs(
             dataset.labels,
-            non_maximum_supression(pred_events_high_recall, 0),
+            # non_maximum_supression(pred_events_high_recall, 0),
+            pred_events_high_recall,
             plot_pr=True,
         )
         avg_mAP = np.mean(mAPs[1:])

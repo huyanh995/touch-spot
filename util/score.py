@@ -112,7 +112,7 @@ def compute_mAPs(truth, pred, tolerances=[0, 1, 2, 4], plot_pr=False):
                 get_predictions(pred, label=label),
                 truth_for_label,
                 tolerance=tol,
-                # plot_ax=axes[j, i] if axes is not None else None)
+                # plot_ax=axes[j, i] if axes is not None else None
                 plot_ax=axes[i] if axes is not None else None,
             )  # since only one label -> 1D array
             class_aps.append((label, ap))

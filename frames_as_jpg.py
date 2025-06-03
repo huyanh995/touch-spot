@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
 
-import os
 import argparse
+import os
 from typing import NamedTuple
-import numpy as np
+
 import cv2
+import numpy as np
+
 cv2.setNumThreads(0)
-from tqdm import tqdm
 from multiprocessing import Pool
 
-from util.io import load_json
+from tqdm import tqdm
 
+from util.io import load_json
 
 FS_LABEL_DIR = 'data/fs_comp'
 TENNIS_LABEL_DIR = 'data/tennis'
@@ -41,6 +43,13 @@ def get_args():
 
 def get_fs_tasks(video_dir, out_dir, max_height):
     tasks = []
+    video_files = os.listdir(video_dir)
+    def match_video_file(prefix):
+        for v in video_files:
+            if v.startswith(prefix):
+                return v
+        else:
+            raise Exception('Not found: {}'.format(prefix))
 
     for split in ['train', 'val', 'test']:
         split_file = os.path.join(FS_LABEL_DIR, split + '.json')
@@ -57,7 +66,9 @@ def get_fs_tasks(video_dir, out_dir, max_height):
             if out_dir is not None:
                 video_out_path = os.path.join(out_dir, video_name)
 
-            video_path = os.path.join(video_dir, base_video_name + '.mkv')
+            # video_path = os.path.join(video_dir, base_video_name + '.mkv')
+            video_path = os.path.join(video_dir, match_video_file(base_video_name))
+
             tasks.append(Task(
                 video_name=video_name, video_path=video_path,
                 out_path=video_out_path,
@@ -116,7 +127,7 @@ def extract_frames(task):
     else:
         oh, ow = h, w
 
-    assert np.isclose(fps, task.target_fps), (fps, task.target_fps)
+    assert np.isclose(fps, task.target_fps), (task.video_path, fps, task.target_fps)
 
     if task.out_path is not None:
         os.makedirs(task.out_path)
@@ -158,7 +169,7 @@ def main(dataset, video_dir, out_dir, max_height, parallelism):
         print('No output directory given. Doing a dry run!')
         is_dry_run = True
     else:
-        os.makedirs(out_dir)
+        os.makedirs(out_dir, exist_ok=True)
 
     with Pool(parallelism) as p:
         for _ in tqdm(
