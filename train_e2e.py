@@ -369,7 +369,7 @@ class E2EModel(BaseRGBModel):
 
         return epoch_loss / len(loader)     # Avg loss
 
-    def predict(self, seq, use_amp=True):
+    def predict(self, seq, hands, objs, use_amp=True):
         if not isinstance(seq, torch.Tensor):
             seq = torch.FloatTensor(seq)
         if len(seq.shape) == 4: # (L, C, H, W)
@@ -377,10 +377,13 @@ class E2EModel(BaseRGBModel):
         if seq.device != self.device:
             seq = seq.to(self.device)
 
+        hands = hands.to(self.device)  # (B, T, 2, 96, 96)
+        objs = objs.to(self.device)  # (B, T, 4, 96, 96)
+
         self._model.eval()
         with torch.no_grad():
             with torch.cuda.amp.autocast() if use_amp else nullcontext():
-                pred = self._model(seq)
+                pred = self._model(seq, hands, objs)
             if isinstance(pred, tuple):
                 pred = pred[0]
             if len(pred.shape) > 3:
@@ -407,7 +410,7 @@ def evaluate(model, dataset, split, classes, save_pred, calc_stats=True,
     )):
         if batch_size > 1:
             # Batched by dataloader
-            _, batch_pred_scores = model.predict(clip['frame'])
+            _, batch_pred_scores = model.predict(clip['frame'], clip['hands'], clip['objs'])
 
             for i in range(clip['frame'].shape[0]):
                 video = clip['video'][i]

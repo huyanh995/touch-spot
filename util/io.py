@@ -1,8 +1,8 @@
-import os
-import re
-import json
-import pickle
 import gzip
+import json
+import os
+import pickle
+import re
 
 
 def load_json(fpath):
