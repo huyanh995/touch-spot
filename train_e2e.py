@@ -13,6 +13,7 @@ from contextlib import nullcontext
 import numpy as np
 import torch
 from tabulate import tabulate
+from torchvision.models import resnet18
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -44,7 +45,7 @@ INFERENCE_BATCH_SIZE = 4
 
 
 # Prevent the GRU params from going too big (cap it at a RegNet-Y 800MF)
-MAX_GRU_HIDDEN_DIM = 768
+MAX_GRU_HIDDEN_DIM = 768 + 128
 
 
 def get_args():
@@ -109,7 +110,7 @@ def get_args():
 
     parser.add_argument('--dilate_len', type=int, default=0,
                         help='Label dilation when training')
-    parser.add_argument('--mixup', type=bool, default=True)
+    parser.add_argument('--mixup', type=bool, default=False) # NOTE: turn off for patch-based training
 
     parser.add_argument('-j', '--num_workers', type=int,
                         help='Base number of dataloader workers')
@@ -174,6 +175,13 @@ class E2EModel(BaseRGBModel):
             else:
                 raise NotImplementedError(feature_arch)
 
+            # Encoder for hands and objs patches
+            self.patch_encoder = resnet18(pretrained=True)
+            self.patch_encoder.fc = nn.Linear(self.patch_encoder.fc.in_features, 64)
+
+            # self.obj_encoder = resnet18(pretrained=True)
+            # self.obj_encoder.fc = nn.Linear(self.obj_encoder.fc.in_features, 64)
+
             # Add Temporal Shift Modules
             self._require_clip_len = -1
             if feature_arch.endswith('_tsm'):
@@ -187,14 +195,14 @@ class E2EModel(BaseRGBModel):
             self._feat_dim = feat_dim
 
             if 'gru' in temporal_arch:
-                hidden_dim = feat_dim
+                hidden_dim = feat_dim + 128
                 if hidden_dim > MAX_GRU_HIDDEN_DIM:
                     hidden_dim = MAX_GRU_HIDDEN_DIM
                     print('Clamped GRU hidden dim: {} -> {}'.format(
-                        feat_dim, hidden_dim))
+                        feat_dim + 128, hidden_dim))
                 if temporal_arch in ('gru', 'deeper_gru'):
                     self._pred_fine = GRUPrediction(
-                        feat_dim, num_classes, hidden_dim,
+                        feat_dim + 128, num_classes, hidden_dim,
                         num_layers=3 if temporal_arch[0] == 'd' else 1)
                 else:
                     raise NotImplementedError(temporal_arch)
@@ -207,10 +215,26 @@ class E2EModel(BaseRGBModel):
             else:
                 raise NotImplementedError(temporal_arch)
 
-        def forward(self, x):
-            batch_size, true_clip_len, channels, height, width = x.shape
+            # Hand-Object Cross-Attention
+            self.hand_obj_attention = nn.MultiheadAttention(
+                embed_dim=64, num_heads=4, batch_first=True)
 
+            # Hand-Scene Cross-Attention
+            self.hand_scene_attention = nn.MultiheadAttention(
+                embed_dim=64, num_heads=4, batch_first=True)
+
+            # Projection layer to match scene features to hand feature dim
+            self.scene_proj = nn.Linear(feat_dim, 64)
+
+        def forward(self, x, hands, objs):
+            """
+            x: (B, T, C, H, W) - RGB frames
+            hands: (B, T, 2, 3, 96, 96) - Hands patches
+            objs: (B, T, 4, 3, 96, 96) - Objects patches
+            """
+            batch_size, true_clip_len, channels, height, width = x.shape
             clip_len = true_clip_len
+
             if self._require_clip_len > 0:
                 # TSM module requires clip len to be known
                 assert true_clip_len <= self._require_clip_len, \
@@ -219,17 +243,63 @@ class E2EModel(BaseRGBModel):
                 if true_clip_len < self._require_clip_len:
                     x = F.pad(
                         x, (0,) * 7 + (self._require_clip_len - true_clip_len,))
+                    # Pad hands and objs too
+                    hands = F.pad(
+                        hands, (0, 0, 0, 0, 0, 0, 0, 0, 0, self._require_clip_len - true_clip_len))
+                    objs = F.pad(
+                        objs, (0, 0, 0, 0, 0, 0, 0, 0, 0, self._require_clip_len - true_clip_len))
                     clip_len = self._require_clip_len
 
+            # Extract image features
             im_feat = self._features(
                 x.view(-1, channels, height, width)
             ).reshape(batch_size, clip_len, self._feat_dim)
 
+            # Use single encoder for both hands and objects
+            # Concatenate hands and objects for batch processing
+            hands_flat = hands.view(-1, 3, 96, 96)  # (B*T*2, 3, 96, 96)
+            objs_flat = objs.view(-1, 3, 96, 96)    # (B*T*4, 3, 96, 96)
+            all_patches = torch.cat([hands_flat, objs_flat], dim=0)  # (B*T*6, 3, 96, 96)
+
+            # Extract features with shared encoder
+            all_features = self.patch_encoder(all_patches)  # (B*T*6, feat_dim)
+
+            # Split back into hands and objects
+            hand_feat = all_features[:hands_flat.shape[0]].reshape(batch_size, clip_len, 2, -1)  # (B, T, 2, feat_dim)
+            obj_feat = all_features[hands_flat.shape[0]:].reshape(batch_size, clip_len, 4, -1)   # (B, T, 4, feat_dim)
+
+            # Apply attention mechanisms
+            batch_size, clip_len = hand_feat.shape[:2]
+
+            # Reshape for attention: (B*T, num_hands/objs, feat_dim)
+            hand_feat_flat = hand_feat.view(-1, 2, 64)  # (B*T, 2, 64)
+            obj_feat_flat = obj_feat.view(-1, 4, 64)    # (B*T, 4, 64)
+
+            # 1. Hand-Object Cross-Attention
+            attended_hands, _ = self.hand_obj_attention(
+                hand_feat_flat, obj_feat_flat, obj_feat_flat)  # (B*T, 2, 64)
+
+            # 2. Hand-Scene Cross-Attention
+            scene_feat_proj = self.scene_proj(im_feat.view(-1, self._feat_dim))  # (B*T, 64)
+            scene_feat_expanded = scene_feat_proj.unsqueeze(1)  # (B*T, 1, 64)
+
+            scene_aware_hands, _ = self.hand_scene_attention(
+                attended_hands, scene_feat_expanded, scene_feat_expanded)  # (B*T, 2, 64)
+
+            # Reshape back to original format
+            final_hand_feat = scene_aware_hands.view(batch_size, clip_len, 2, 64)
+
+            # Flatten for fusion
+            fused_features = torch.cat([
+                final_hand_feat.flatten(start_dim=2),  # (B, T, 128)
+                im_feat  # (B, T, 768)
+            ], dim=-1)  # (B, T, 128 + 768)
+
             if true_clip_len != clip_len:
                 # Undo padding
-                im_feat = im_feat[:, :true_clip_len, :]
+                fused_features = fused_features[:, :true_clip_len, :]
 
-            return self._pred_fine(im_feat)
+            return self._pred_fine(fused_features)
 
         def print_stats(self):
             print('Model params:',
@@ -269,7 +339,9 @@ class E2EModel(BaseRGBModel):
         epoch_loss = 0.
         with torch.no_grad() if optimizer is None else nullcontext():
             for batch_idx, batch in enumerate(tqdm(loader)):
-                frame = loader.dataset.load_frame_gpu(batch, self.device)
+                frame = loader.dataset.load_frame_gpu(batch, self.device) # (B, T, 3, H, W)
+                hands = batch['hands'].to(self.device)  # (B, T, 2, 96, 96)
+                objs = batch['objs'].to(self.device) # (B, T, 4, 96, 96)
                 label = batch['label'].to(self.device)
 
                 # Depends on whether mixup is used
@@ -277,7 +349,7 @@ class E2EModel(BaseRGBModel):
                     else label.view(-1, label.shape[-1])
 
                 with torch.cuda.amp.autocast():
-                    pred = self._model(frame)
+                    pred = self._model(frame, hands, objs) # TODO
 
                     loss = 0.
                     if len(pred.shape) == 3:

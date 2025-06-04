@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
 import copy
+import json
 import os
 import random
 
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import Dataset
@@ -39,6 +41,11 @@ class FrameReader:
         self._same_transform = same_transform
         self._second_stream_transforms = second_stream_transforms
 
+        with open(os.path.join(os.path.dirname(frame_dir), 'handobj_anno_train.json'), 'r') as f:
+            self.handobj_anno = json.load(f)
+        with open(os.path.join(os.path.dirname(frame_dir), 'handobj_anno_val.json'), 'r') as f:
+            self.handobj_anno = self.handobj_anno | json.load(f)
+
     def read_frame(self, frame_path):
         img = torchvision.io.read_image(frame_path).float() / 255
         if self._is_flow:
@@ -56,12 +63,28 @@ class FrameReader:
     def read_rgb_pose(self, frame_path):
         raise NotImplementedError('Pose not implemented yet!')
 
+    def bbox_crop(self, img, bbox):
+        if bbox is None:
+            return torch.zeros(3, 96, 96)
+        x1, y1, x2, y2 = bbox
+        cropped_img = img[:, y1:y2, x1:x2]
+        cropped_img = F.interpolate(cropped_img.unsqueeze(0), size=(96, 96),
+                                    mode='bilinear', align_corners=False).squeeze(0)
+        return cropped_img
+
+    def extract_patches(self, img, annotations, max_count):
+        bboxes = [anno[:4] for anno in annotations]
+        # Pad and truncate in one step
+        bboxes = (bboxes + [None] * max_count)[:max_count]
+        return [self.bbox_crop(img, bbox) for bbox in bboxes]
 
     def load_frames(self, video_name, start, end, pad=False, stride=1,
                     randomize=False):
         rand_crop_state = None
         rand_state_backup = None
         ret = []
+        hands = []
+        objs = []
         n_pad_start = 0
         n_pad_end = 0
         for frame_num in range(start, end, stride):
@@ -75,11 +98,13 @@ class FrameReader:
             frame_path = os.path.join(
                 self._frame_dir, video_name,
                 FrameReader.IMG_NAME.format(frame_num))
+
             try:
                 if self._modality == 'twostream':
                     img, second = self.read_rgb_flow(frame_path)
                 else:
                     img = self.read_frame(frame_path)
+                    handobj = self.handobj_anno[video_name].get(FrameReader.IMG_NAME.format(frame_num), {'hands': [], 'objects': []})
                     second = None
                 if self._crop_transform:
                     if self._same_transform:
@@ -106,13 +131,24 @@ class FrameReader:
                     img = torch.cat((img, second), dim=0)
 
                 ret.append(img)
+
+                # Load hand and object patches
+                hand_patches = self.extract_patches(img[:3, :, :], handobj['hands'], 2)
+                obj_patches = self.extract_patches(img[:3, :, :], handobj['objects'], 4)
+
+                hands.append(torch.stack(hand_patches, dim=0))
+                objs.append(torch.stack(obj_patches, dim=0))
+
             except RuntimeError:
                 # print('Missing file!', frame_path)
                 n_pad_end += 1
 
         # In the multicrop case, the shape is (B, T, C, H, W)
         try:
-            ret = torch.stack(ret, dim=int(len(ret[0].shape) == 4)) # DEBUG (40, 5, 224, 224)
+            ret = torch.stack(ret, dim=int(len(ret[0].shape) == 4)) #  (40, 3, 224, 224)
+            hands = torch.stack(hands, dim=int(len(ret[0].shape) == 4)) # (40, 2, 3, 96, 96)
+            objs = torch.stack(objs, dim=int(len(ret[0].shape) == 4)) # (40, 4, 3, 96, 96)
+
         except IndexError:
             print("DEBUG >>>")
         if self._same_transform:
@@ -126,7 +162,14 @@ class FrameReader:
         if n_pad_start > 0 or (pad and n_pad_end > 0):
             ret = nn.functional.pad(
                 ret, (0, 0, 0, 0, 0, 0, n_pad_start, n_pad_end if pad else 0))
-        return ret
+
+            # Pad hands and objects with the same temporal padding
+            hands = nn.functional.pad(
+                hands, (0, 0, 0, 0, 0, 0, 0, 0, n_pad_start, n_pad_end if pad else 0))
+
+            objs = nn.functional.pad(
+                objs, (0, 0, 0, 0, 0, 0, 0, 0, n_pad_start, n_pad_end if pad else 0))
+        return ret, hands, objs
 
 
 # Pad the start/end of videos with empty frames
@@ -199,8 +242,8 @@ def _load_frame_deferred(gpu_transform, batch, device):
 def _rgb_transforms(is_eval, defer_transform):
     img_transforms = []
     if not is_eval:
-        img_transforms.append(
-            transforms.RandomHorizontalFlip())
+        # img_transforms.append(
+        #     transforms.RandomHorizontalFlip()) # for hand obj better not to flip
 
         if not defer_transform:
             img_transforms.extend([
@@ -408,6 +451,14 @@ class ActionSpotDataset(Dataset):
             is_eval, crop_dim, modality, same_transform,
             defer_transform=self._gpu_transform is not None)
 
+        # Load hand and object bounding boxes
+        # if self._is_eval:
+        #     with open(os.path.join(os.path.dirname(frame_dir), 'handobj_anno_val.json'), 'r') as f:
+        #         self.handobj_anno = json.load(f)
+        # else:
+        #     with open(os.path.join(os.path.dirname(frame_dir), 'handobj_anno_train.json'), 'r') as f:
+        #         self.handobj_anno = json.load(f)
+
         self._frame_reader = FrameReader(
             frame_dir, modality, crop_transform, img_transform, same_transform, second_stream_transforms)
 
@@ -469,12 +520,12 @@ class ActionSpotDataset(Dataset):
                 ):
                     labels[i] = label
 
-        frames = self._frame_reader.load_frames(
+        frames, hands, objs = self._frame_reader.load_frames(
             video_meta['video'], base_idx,
             base_idx + self._clip_len * self._stride, pad=True,
             stride=self._stride, randomize=not self._is_eval)
 
-        return {'frame': frames, 'contains_event': int(np.sum(labels) > 0),
+        return {'frame': frames, 'hands': hands, 'objs': objs, 'contains_event': int(np.sum(labels) > 0),
                 'label': labels}
 
     def __getitem__(self, unused):
@@ -555,20 +606,30 @@ class ActionSpotVideoDataset(Dataset):
                 self._clips.append((l['video'], i))
             assert has_clip, l
 
+        # Load hand and object bounding boxes
+        # if self._is_eval:
+        #     with open(os.path.join(os.path.dirname(frame_dir), 'handobj_anno_val.json'), 'r') as f:
+        #         self.handobj_anno = json.load(f)
+        # else:
+        #     with open(os.path.join(os.path.dirname(frame_dir), 'handobj_anno_train.json'), 'r') as f:
+        #         self.handobj_anno = json.load(f)
+
     def __len__(self):
         return len(self._clips)
 
     def __getitem__(self, idx):
         video_name, start = self._clips[idx]
-        frames = self._frame_reader.load_frames(
+        frames, hands, objs = self._frame_reader.load_frames(
             video_name, start, start + self._clip_len * self._stride, pad=True,
             stride=self._stride)
 
         if self._flip:
             frames = torch.stack((frames, frames.flip(-1)), dim=0)
+            hands = torch.stack((hands, hands.flip(-1)), dim=0)
+            objs = torch.stack((objs, objs.flip(-1)), dim=0)
 
         return {'video': video_name, 'start': start // self._stride,
-                'frame': frames}
+                'frame': frames, 'hands': hands, 'objs': objs}
 
     def get_labels(self, video):
         meta = self._labels[self._video_idxs[video]]
