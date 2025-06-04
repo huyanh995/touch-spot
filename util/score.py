@@ -112,8 +112,8 @@ def compute_mAPs(truth, pred, tolerances=[0, 1, 2, 4], plot_pr=False):
                 get_predictions(pred, label=label),
                 truth_for_label,
                 tolerance=tol,
-                # plot_ax=axes[j, i] if axes is not None else None
-                plot_ax=axes[i] if axes is not None else None,
+                plot_ax=axes[j, i] if axes is not None else None
+                # plot_ax=axes[i] if axes is not None else None,
             )  # since only one label -> 1D array
             class_aps.append((label, ap))
         mAP = np.mean([x[1] for x in class_aps])
@@ -137,8 +137,8 @@ def compute_mAPs(truth, pred, tolerances=[0, 1, 2, 4], plot_pr=False):
     if plot_pr:
         for i, tol in enumerate(tolerances):
             for j, label in enumerate(sorted(truth_by_label.keys())):
-                # ax = axes[j, i]
-                ax = axes[i]
+                ax = axes[j, i]
+                # ax = axes[i]
                 ax.set_xlabel("Recall")
                 ax.set_xlim(0, 1)
                 ax.set_ylabel("Precision")
