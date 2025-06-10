@@ -20,6 +20,7 @@ DATASETS = [
     "egoper_touch",
     "EK_v1",
     "unified_v1",
+    "unified_v1_shuffle",
 ]
 
 
