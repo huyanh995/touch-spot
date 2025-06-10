@@ -23,6 +23,7 @@ import torch.nn.functional as F
 import torchvision
 from torch.optim.lr_scheduler import ChainedScheduler, CosineAnnealingLR, LinearLR
 from torch.utils.data import DataLoader
+from torchvision.models import Swin_S_Weights, ViT_B_16_Weights, swin_s, vit_b_16
 from tqdm import tqdm
 
 from dataset.frame import ActionSpotDataset, ActionSpotVideoDataset
@@ -67,6 +68,8 @@ def get_args():
             'rn50',
             'rn50_tsm',
             'rn50_gsm',
+            'swin',
+            'vit'
 
             # From timm (following its naming conventions)
             'rny002',
@@ -170,6 +173,11 @@ class E2EModel(BaseRGBModel):
                 if not is_rgb:
                     features.stem[0] = nn.Conv2d(
                         in_channels, 96, kernel_size=4, stride=4)
+            elif 'swin' in feature_arch:
+                assert is_rgb, 'Only RGB input supported for Swin Transformer'
+                features = swin_s(weights=Swin_S_Weights.IMAGENET1K_V1)
+                feat_dim = features.head.in_features
+                features.head = nn.Identity()
 
             else:
                 raise NotImplementedError(feature_arch)
