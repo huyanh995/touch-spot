@@ -34,7 +34,7 @@ from util.eval import non_maximum_supression, process_frame_predictions
 from util.io import clear_files, load_json, store_gz_json, store_json
 from util.score import compute_mAPs
 
-EPOCH_NUM_FRAMES = 100_000 # default 500_000
+EPOCH_NUM_FRAMES = 200_000 # default 500_000
 
 BASE_NUM_WORKERS = 4
 
