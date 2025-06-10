@@ -16,6 +16,7 @@ DATASETS = [
     "touch_v4",
     "assembly_touch",
     "assembly_touch_v2",
+    "assembly_touch_v2_shuffle",
     "egoper_touch",
     "EK_v1",
     "unified_v1",
