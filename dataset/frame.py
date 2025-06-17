@@ -41,10 +41,14 @@ class FrameReader:
         self._same_transform = same_transform
         self._second_stream_transforms = second_stream_transforms
 
-        with open(os.path.join(os.path.dirname(frame_dir), 'handobj_anno_train.json'), 'r') as f:
-            self.handobj_anno = json.load(f)
-        with open(os.path.join(os.path.dirname(frame_dir), 'handobj_anno_val.json'), 'r') as f:
-            self.handobj_anno = self.handobj_anno | json.load(f)
+        if os.path.exists(os.path.join(os.path.dirname(frame_dir), 'handobj_anno.json')):
+            with open(os.path.join(os.path.dirname(frame_dir), 'handobj_anno.json'), 'r') as f:
+                self.handobj_anno = json.load(f)
+        else:
+            with open(os.path.join(os.path.dirname(frame_dir), 'handobj_anno_train.json'), 'r') as f:
+                self.handobj_anno = json.load(f)
+            with open(os.path.join(os.path.dirname(frame_dir), 'handobj_anno_val.json'), 'r') as f:
+                self.handobj_anno = self.handobj_anno | json.load(f)
 
     def read_frame(self, frame_path):
         img = torchvision.io.read_image(frame_path).float() / 255
